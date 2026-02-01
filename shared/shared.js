@@ -2,6 +2,8 @@
 (function () {
   "use strict";
 
+document.documentElement.setAttribute("data-tier", (window.BIZ?.tier || "starter"));
+  
   // --- Helpers ---
   const B = window.BIZ || {};
   const qs = (sel, root = document) => root.querySelector(sel);
