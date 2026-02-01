@@ -149,6 +149,20 @@ html[data-tier="elite"] [data-tier="elite"] {
   </div>
 
   <!-- REQUIRED SHARED LOGIC -->
+
+<script>
+  // TEMP debug: show JS errors on-screen (so we don't need DevTools)
+  window.onerror = function (msg, src, line, col, err) {
+    document.body.innerHTML =
+      "<pre style='white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff'>" +
+      "JS ERROR:\n" + msg + "\n\n" +
+      (src ? ("FILE: " + src + "\n") : "") +
+      (line ? ("LINE: " + line + ":" + col + "\n\n") : "") +
+      (err && err.stack ? err.stack : "") +
+      "</pre>";
+  };
+</script>
+  
   <script src="shared/config.js"></script>
   <script src="shared/shared.js"></script>
 </body>
