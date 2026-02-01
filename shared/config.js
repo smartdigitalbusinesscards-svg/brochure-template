@@ -9,14 +9,14 @@ window.BIZ = {
   title: "REPLACE_TITLE",
 
   phonePretty: "REPLACE_PHONE_PRETTY",
-  phoneTel: "REPLACE_PHONE_TEL",
+  phoneTel: "REPLACE_PHONE_TEL", // digits only recommended
   email: "REPLACE_EMAIL",
   website: "REPLACE_WEBSITE",
 
   bookingLink: "REPLACE_BOOKING_LINK",
-  textPrefill: "REPLACE_TEXT_PREFILL",
+  textPrefill: "Hi! I just checked out your Smart Digital Brochure. I have a quick question:",
 
-  // ELITE ONLY
+  // ELITE ONLY (optional)
   eliteCtaLabel: "REPLACE_ELITE_CTA_LABEL",
   eliteCtaUrl: "REPLACE_ELITE_CTA_URL"
 };
