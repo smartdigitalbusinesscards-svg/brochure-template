@@ -1,4 +1,3 @@
-// shared/config.js
 window.BIZ = {
   tier: "starter", // starter | pro | elite
 
@@ -7,12 +6,11 @@ window.BIZ = {
   city: "Tracy, CA",
   title: "Water Consultant",
 
-  phonePretty: "(209) 555-1234",
   phoneTel: "12095551234",
   email: "test@example.com",
   website: "selectsourcewater.com",
 
-  bookingLink: "REPLACE_BOOKING_LINK",           // ← will be treated as unset
+  bookingLink: "REPLACE_BOOKING_LINK",
   textPrefill: "Hi! I just checked out your Smart Digital Brochure. Quick question:",
 
   eliteCtaTitle: "REPLACE_ELITE_CTA_TITLE",
