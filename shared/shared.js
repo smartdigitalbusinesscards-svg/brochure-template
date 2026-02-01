@@ -1,129 +1,215 @@
 // shared/shared.js
-(() => {
-  const $ = id => document.getElementById(id);
+(function () {
+  "use strict";
 
-  const isPlaceholder = v => !v || String(v).trim() === "" || /REPLACE_/i.test(String(v).trim());
+  function ready(fn){
+    if (document.readyState !== "loading") fn();
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
 
-  const normUrl = u => {
-    if (isPlaceholder(u)) return "";
-    let s = String(u).trim();
-    if (/^https?:\/\//i.test(s)) return s;
-    return "https://" + s;
-  };
+  function isPlaceholder(v){
+    if (v === null || v === undefined) return true;
+    const s = String(v).trim();
+    return s === "" || s.toUpperCase().includes("REPLACE_");
+  }
 
-  const normPhone = p => String(p || "").replace(/[^\d+]/g, "");
+  function ensureHttp(url){
+    if (isPlaceholder(url)) return "";
+    const u = String(url).trim();
+    if (/^https?:\/\//i.test(u)) return u;
+    if (/^(mailto:|tel:|sms:)/i.test(u)) return u;
+    return "https://" + u;
+  }
 
-  const setText = (id, val, fallback = "") => {
-    const el = $(id);
-    if (el) el.textContent = isPlaceholder(val) ? fallback : String(val).trim();
-  };
+  function sanitizePhoneTel(p){
+    if (isPlaceholder(p)) return "";
+    let s = String(p).trim().replace(/[^\d+]/g, "");
+    s = s.replace(/\+(?=.+\+)/g, "");
+    return s;
+  }
 
-  const enableLink = (id, href, label = null) => {
-    const a = $(id);
-    if (!a) return;
-    if (!href) {
-      a.setAttribute("aria-disabled", "true");
-      a.classList.add("disabled");
+  function buildSmsHref(phone, body){
+    const p = sanitizePhoneTel(phone);
+    if (!p) return "";
+    const msg = String(body || "").trim();
+    if (!msg) return `sms:${p}`;
+    return `sms:${p}?body=${encodeURIComponent(msg)}`;
+  }
+
+  function setText(id, value){
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!isPlaceholder(value)) el.textContent = String(value);
+  }
+
+  function setImage(id, src){
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!isPlaceholder(src)) el.setAttribute("src", String(src));
+  }
+
+  function setLink(id, href, label){
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (!href || isPlaceholder(href)) {
+      el.setAttribute("aria-disabled", "true");
+      el.removeAttribute("href");
+      if (label) el.textContent = label;
       return;
     }
-    a.href = href;
-    a.removeAttribute("aria-disabled");
-    a.classList.remove("disabled");
-    if (label) a.textContent = label;
-  };
 
-  const init = () => {
+    el.setAttribute("href", href);
+    el.removeAttribute("aria-disabled");
+    if (label && !isPlaceholder(label)) el.textContent = label;
+  }
+
+  function showTierSections(tier){
+    const showPro = (tier === "pro" || tier === "elite");
+    const showElite = (tier === "elite");
+
+    document.querySelectorAll('[data-tier="pro"]').forEach(el=>{
+      el.style.display = showPro ? "" : "none";
+    });
+    document.querySelectorAll('[data-tier="elite"]').forEach(el=>{
+      el.style.display = showElite ? "" : "none";
+    });
+  }
+
+  ready(function () {
     const B = window.BIZ || {};
-    const tier = (B.tier || "starter").toLowerCase().trim();
+    const tier = String(B.tier || "starter").toLowerCase().trim();
 
-    document.documentElement.dataset.tier = tier;
+    // Tier badge text
+    const tierBadge = document.getElementById("tierBadge");
+    if (tierBadge) tierBadge.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
 
-    // Basics
-    setText("pageTitle", `${B.company} | ${B.productTitle}`);
-    setText("companyKicker", B.company, "Company Name");
-    setText("productTitle", B.productTitle, "Product Name");
-    setText("priceValue", B.price, "$ --");
-    setText("companyFooter", B.company);
-    setText("companyWatermark", B.company);
-    setText("year", new Date().getFullYear());
+    // Header
+    setText("kicker", B.company);
+    setText("headline", B.headline);
 
-    // Image
-    const imgSrc = isPlaceholder(B.brochureImg) ? "brochure.png" : B.brochureImg;
-    const brochureImg = $("brochureImg");
-    const modalImg = $("modalImg");
-    if (brochureImg) brochureImg.src = imgSrc;
-    if (modalImg) modalImg.src = imgSrc;
+    // Subline pill
+    const sub = [B.fullName, B.title, B.city].filter(v => !isPlaceholder(v)).join(" · ");
+    if (sub) setText("sublinePill", sub);
 
-    // Features list
-    const ul = $("featuresList");
-    if (ul && Array.isArray(B.features) && B.features.length) {
-      ul.innerHTML = B.features.map(f => `<li><span class="check">✓</span><span class="liText">${f}</span></li>`).join("");
+    // Badges
+    if (Array.isArray(B.badges)) {
+      const ids = ["badge1","badge2","badge3","badge4"];
+      ids.forEach((id, i)=>{
+        const el = document.getElementById(id);
+        if (!el) return;
+        const val = B.badges[i];
+        if (isPlaceholder(val)) {
+          el.style.display = "none";
+        } else {
+          el.textContent = String(val);
+          el.style.display = "";
+        }
+      });
     }
 
-    // Badges (pro/elite show more/custom)
-    const badgeRow = $("badgeRow");
-    if (badgeRow && Array.isArray(B.badges) && B.badges.length) {
-      badgeRow.innerHTML = B.badges.map(b => `<div class="badge">${b}</div>`).join("");
+    // Tier badge chips
+    if (!isPlaceholder(B.badgePro)) setText("badgePro", B.badgePro);
+    if (!isPlaceholder(B.badgeElite)) setText("badgeElite", B.badgeElite);
+
+    // Brochure image + modal image
+    setImage("brochureImg", B.brochureImage);
+    setImage("modalImg", B.brochureImage);
+
+    // Price
+    setText("priceLabel", B.priceLabel);
+    setText("priceValue", B.priceValue);
+    setText("pricePill", B.pricePill);
+
+    // Features
+    if (Array.isArray(B.features)) {
+      setText("feat1", B.features[0]);
+      setText("feat2", B.features[1]);
+      setText("feat3", B.features[2]);
+      setText("feat4", B.features[3]);
     }
+    setText("featPro", B.featurePro);
+    setText("featElite", B.featureElite);
 
-    // Links
-    const phone = normPhone(B.phoneTel);
-    enableLink("callBtn", phone ? `tel:${phone}` : "", B.phonePretty || "Call");
-    enableLink("textBtn", phone ? `sms:\( {phone} \){B.textPrefill ? `?body=${encodeURIComponent(B.textPrefill)}` : ""}` : "", "Text");
-    enableLink("websiteBtn", normUrl(B.website), "Website");
+    // Footer / watermark
+    setText("footerPill", B.footerPill);
+    setText("watermarkText", B.watermark);
 
-    // Shine effect
-    const priceEl = $("priceValue");
-    if (priceEl && !isPlaceholder(B.price)) {
-      priceEl.classList.add("shine-once");
-      setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
+    // Contact links
+    const phoneTel = sanitizePhoneTel(B.phoneTel);
+    setLink("callBtn", phoneTel ? `tel:${phoneTel}` : "", "Call");
+    setLink("textBtn", phoneTel ? buildSmsHref(phoneTel, B.textPrefill) : "", "Text");
+    setLink("websiteBtn", !isPlaceholder(B.website) ? ensureHttp(B.website) : "", "Website");
+
+    // View brochure button opens modal
+    const viewBtn = document.getElementById("viewBrochureBtn");
+    if (viewBtn) viewBtn.addEventListener("click", function(e){ e.preventDefault(); openModal(); });
+
+    // Booking (optional)
+    const bookingOk = !isPlaceholder(B.bookingLink);
+    const bookingWrap = document.getElementById("bookingBtnWrap");
+    if (bookingWrap) bookingWrap.style.display = bookingOk ? "" : "none";
+    setLink("bookBtn", bookingOk ? ensureHttp(B.bookingLink) : "", "Book");
+
+    // Elite CTA (optional + elite only)
+    const eliteOk = (tier === "elite") && !isPlaceholder(B.eliteCtaUrl);
+    const eliteWrap = document.getElementById("eliteCtaBtnWrap");
+    if (eliteWrap) eliteWrap.style.display = eliteOk ? "" : "none";
+    setLink("eliteCtaBtn", eliteOk ? ensureHttp(B.eliteCtaUrl) : "", B.eliteCtaLabel || "Elite Offer");
+
+    // Tier section visibility
+    showTierSections(tier);
+
+    // Modal behavior
+    const modal = document.getElementById("modal");
+    const open1 = document.getElementById("openModal");
+    const img = document.getElementById("modalImg");
+
+    function openModal(){
+      if (!modal) return;
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
     }
-
-    // Modal
-    const modal = $("modal");
-    const openBtns = [ $("openModal"), $("viewBrochureBtn") ];
-    const closeModal = () => {
+    function closeModal(){
+      if (!modal) return;
       modal.classList.remove("open");
       document.body.style.overflow = "";
-    };
-
-    openBtns.forEach(btn => {
-      if (btn) btn.onclick = e => {
-        e.preventDefault();
-        modal.classList.add("open");
-        document.body.style.overflow = "hidden";
-      };
-    });
-
-    if (modal) {
-      modal.onclick = e => {
-        if (e.target === modal || e.target.id === "modalImg") closeModal();
-      };
     }
 
-    // Ripple on all .btn
-    document.querySelectorAll(".btn").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const rect = btn.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height) * 2;
-        const x = e.clientX - rect.left - size/2;
-        const y = e.clientY - rect.top - size/2;
+    if (open1) open1.addEventListener("click", function(e){ e.preventDefault(); openModal(); });
+    if (modal) modal.addEventListener("click", closeModal);
+    if (img) img.addEventListener("click", closeModal);
 
-        const ripple = document.createElement("span");
-        ripple.className = "ripple";
-        ripple.style.width = ripple.style.height = size + "px";
-        ripple.style.left = x + "px";
-        ripple.style.top = y + "px";
-        btn.appendChild(ripple);
-
-        ripple.addEventListener("animationend", () => ripple.remove(), {once: true});
-      });
+    // Shine effect once
+    const priceEl = document.getElementById("priceValue");
+    window.addEventListener("load", () => {
+      if (!priceEl) return;
+      priceEl.classList.add("shine-once");
+      setTimeout(()=>priceEl.classList.remove("shine-once"),1200);
     });
-  };
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+    // Ripple effect
+    function addRipple(e){
+      const btn = e.currentTarget;
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2;
+      const cx = (e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || (rect.left + rect.width/2));
+      const cy = (e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || (rect.top + rect.height/2));
+      const x = cx - rect.left - size/2;
+      const y = cy - rect.top - size/2;
+
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      ripple.style.width = ripple.style.height = size + "px";
+      ripple.style.left = x + "px";
+      ripple.style.top = y + "px";
+      btn.appendChild(ripple);
+      ripple.addEventListener("animationend", ()=>ripple.remove(), {once:true});
+    }
+
+    document.querySelectorAll(".btn").forEach(btn=>{
+      btn.addEventListener("click", addRipple);
+      btn.addEventListener("touchstart", addRipple, {passive:true});
+    });
+  });
 })();
