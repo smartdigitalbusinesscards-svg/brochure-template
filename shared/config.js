@@ -1,22 +1,20 @@
 // shared/config.js
 window.BIZ = {
-  // REQUIRED
   tier: "starter", // starter | pro | elite
 
-  fullName: "REPLACE_FULL_NAME",
-  company: "REPLACE_COMPANY",
-  city: "REPLACE_CITY",
-  title: "REPLACE_TITLE",
+  fullName: "Greg Buckner",
+  company: "Select Source Water",
+  city: "Tracy, CA",
+  title: "Water Consultant",
 
-  phonePretty: "REPLACE_PHONE_PRETTY",
-  phoneTel: "REPLACE_PHONE_TEL", // digits only recommended, may include +1
-  email: "REPLACE_EMAIL",
-  website: "REPLACE_WEBSITE", // can be example.com or https://example.com
+  phonePretty: "(209) 555-1234",
+  phoneTel: "12095551234",
+  email: "test@example.com",
+  website: "selectsourcewater.com",
 
-  bookingLink: "REPLACE_BOOKING_LINK", // can be calendly link, etc.
-  textPrefill: "Hi! I just checked out your Smart Digital Brochure. I have a quick question:",
+  bookingLink: "REPLACE_BOOKING_LINK",
+  textPrefill: "Hi! I just checked out your Smart Digital Brochure. Quick question:",
 
-  // ELITE ONLY (optional)
   eliteCtaTitle: "REPLACE_ELITE_CTA_TITLE",
   eliteCtaLabel: "REPLACE_ELITE_CTA_LABEL",
   eliteCtaUrl: "REPLACE_ELITE_CTA_URL"
