@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#04151f" />
+  <title id="pageTitle">Smart Digital Brochure</title>
+
+  <style>
+    :root{
+      --bgA:#04151f;
+      --bgB:#0a2f3f;
+      --glass: rgba(255,255,255,.085);
+      --glass2: rgba(255,255,255,.055);
+      --border: rgba(255,255,255,.16);
+      --text:#ecf6ff;
+      --muted: rgba(236,246,255,.74);
+      --accent:#4fe3ff;
+      --accent2:#63ffb2;
+      --shadow: 0 18px 55px rgba(0,0,0,.48);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(79,227,255,.18), transparent 58%),
+        radial-gradient(860px 520px at 88% 35%, rgba(99,255,178,.12), transparent 58%),
+        linear-gradient(160deg, var(--bgA), var(--bgB));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .water{
+      position:fixed; inset:-70px;
+      background:
+        radial-gradient(1200px 600px at 18% 18%, rgba(79,227,255,.10), transparent 60%),
+        radial-gradient(900px 520px at 82% 62%, rgba(99,255,178,.08), transparent 60%),
+        radial-gradient(700px 420px at 50% 90%, rgba(255,255,255,.055), transparent 60%);
+      filter: blur(18px);
+      animation: drift 12s ease-in-out infinite alternate;
+      pointer-events:none;
+      opacity:.92;
+      z-index:0;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-12px,-10px,0) scale(1.02); }
+      to{ transform: translate3d(14px,12px,0) scale(1.06); }
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:1120px;
+      margin:0 auto;
+      padding:26px 18px 44px;
+    }
+
+    header{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:22px;
+    }
+
+    .brand{ display:flex; flex-direction:column; gap:6px; }
+    .kicker{
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-size:12px;
+      color:var(--muted);
+    }
+    h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.1;
+      letter-spacing:-0.02em;
+    }
+
+    .badgeRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+    .badge{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      backdrop-filter: blur(10px);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:20px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns:1fr; }
+      .badgeRow{ justify-content:flex-start; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      overflow:hidden;
+    }
+
+    .imgCard{
+      padding:12px;
+    }
+    .imgBtn{
+      all:unset;
+      display:block;
+      cursor: zoom-in;
+    }
+    img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+    }
+    .imgHint{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .dot{
+      width:8px; height:8px;
+      border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow:0 0 12px rgba(79,227,255,.55);
+    }
+
+    .infoCard{ padding:22px; }
+
+    .priceRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom:22px;
+    }
+    .priceLabel{
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .priceValue{
+      position:relative;
+      display:inline-block;
+      font-size:36px;
+      font-weight:900;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .priceValue.shine-once::after{
+      content:"";
+      position:absolute;
+      top:-25%; left:-140%;
+      width:70%; height:160%;
+      transform: skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 45%, rgba(255,255,255,0) 100%);
+      animation: priceShine 900ms ease-out 1;
+    }
+    @keyframes priceShine{ from{ left:-140%; } to{ left:140%; } }
+
+    .pill{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.10);
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    ul{
+      margin:0; padding:0; list-style:none;
+      display:grid; gap:12px;
+    }
+    li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+    .check{
+      width:22px; height:22px;
+      border-radius:8px;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(79,227,255,.35));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 0 18px rgba(79,227,255,.22);
+      display:grid; place-items:center;
+      font-size:14px; flex:0 0 auto;
+    }
+    .liText{ font-size:14px; }
+
+    .ctaRow{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap:12px;
+      margin-top:22px;
+    }
+
+    .btn{
+      position:relative; overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      color:var(--text);
+      padding:12px 16px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      transition:transform .12s ease, border-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+      cursor:pointer;
+    }
+    .btn:hover{ transform:translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(79,227,255,.95), rgba(99,255,178,.85));
+      color:#021018;
+      border:none;
+    }
+    .btn[aria-disabled="true"],
+    .btn.disabled{
+      opacity:.45;
+      pointer-events:none;
+      cursor:not-allowed;
+    }
+
+    .ripple{
+      position:absolute;
+      border-radius:999px;
+      transform: scale(0);
+      animation: ripple 600ms ease-out forwards;
+      background: rgba(255,255,255,.35);
+      pointer-events:none;
+    }
+    @keyframes ripple{ to{ transform: scale(1); opacity:0; } }
+
+    footer{
+      margin-top:20px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .watermark{
+      margin-top:12px;
+      text-align:center;
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color: rgba(236,246,255,.35);
+    }
+
+    .modal{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.75);
+      display:none;
+      align-items:center; justify-content:center;
+      z-index:9999; padding:16px;
+    }
+    .modal.open{ display:flex; }
+    .modalInner{
+      background:#060e14;
+      border-radius:16px;
+      max-width:1100px; width:100%;
+      max-height:92vh; overflow:auto;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 22px 80px rgba(0,0,0,.65);
+    }
+    .modalImg{
+      width:100%;
+      border-radius:12px;
+      cursor:zoom-out;
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .water, .priceValue.shine-once::after { animation:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="water"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="kicker" id="companyKicker">Company Name</div>
+        <h1 id="productTitle">Product Name</h1>
+      </div>
+
+      <div class="badgeRow" id="badgeRow">
+        <!-- Badges populated by JS if pro/elite -->
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card imgCard">
+        <button class="imgBtn" id="openModal" aria-label="Zoom brochure">
+          <img id="brochureImg" src="brochure.png" alt="Product Brochure" loading="lazy">
+        </button>
+        <div class="imgHint">
+          <span class="dot"></span> Tap the brochure to zoom in.
+        </div>
+      </section>
+
+      <section class="card infoCard">
+        <div class="priceRow">
+          <div>
+            <div class="priceLabel">Total Price</div>
+            <div class="priceValue" id="priceValue">$ --</div>
+          </div>
+          <div class="pill">One-time total</div>
+        </div>
+
+        <ul id="featuresList">
+          <!-- Dynamic <li> inserted by JS -->
+        </ul>
+
+        <div class="ctaRow">
+          <a class="btn primary" id="viewBrochureBtn">View Brochure</a>
+          <a class="btn" id="textBtn" href="#" aria-disabled="true">Text</a>
+          <a class="btn" id="callBtn" href="#" aria-disabled="true">Call</a>
+          <a class="btn" id="websiteBtn" href="#" target="_blank" aria-disabled="true">Website</a>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="pill">Send this link to your referral partner — mobile friendly</div>
+      <div>© <span id="year">2026</span> <span id="companyFooter">Select Source Water</span></div>
+    </footer>
+
+    <div class="watermark" id="watermark">Installed by <span id="companyWatermark">Select Source Water</span></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modalInner">
+      <img class="modalImg" id="modalImg" src="brochure.png" alt="Enlarged Brochure">
+    </div>
+  </div>
+
+  <script src="shared/config.js"></script>
+  <script src="shared/shared.js"></script>
+</body>
+</html>
