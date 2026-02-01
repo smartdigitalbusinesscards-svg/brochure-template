@@ -84,6 +84,10 @@ html[data-tier="elite"] [data-tier="pro"],
 html[data-tier="elite"] [data-tier="elite"] {
   display: block;
 }
+
+html[data-tier="starter"] [data-tier] {
+  display: none;
+} 
     
   </style>
 </head>
@@ -162,7 +166,16 @@ html[data-tier="elite"] [data-tier="elite"] {
     };
   </script>
 
-  <script src="shared/config.js"></script>
-  <script src="shared/shared.js"></script>
+  <script
+  src="shared/config.js"
+  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;bottom:10px;left:10px;z-index:9999;background:#111a;color:#ecf6ff;padding:8px 10px;border:1px solid #4fe3ff55;border-radius:10px;font:12px system-ui&quot;>✅ config.js loaded<br>tier: '+(window.BIZ?.tier||'MISSING')+'</div>')"
+  onerror="document.body.innerHTML='<pre style=&quot;padding:16px;color:#ecf6ff;background:#0a0f1c;font:14px system-ui&quot;>❌ FAILED TO LOAD: shared/config.js\n\nCheck: /shared/config.js exists in the repo and the folder name is exactly &quot;shared&quot; (case-sensitive).</pre>'"
+></script>
+
+<script
+  src="shared/shared.js"
+  onload="document.body.insertAdjacentHTML('beforeend','<div style=&quot;position:fixed;bottom:10px;right:10px;z-index:9999;background:#111a;color:#ecf6ff;padding:8px 10px;border:1px solid #63ffb255;border-radius:10px;font:12px system-ui&quot;>✅ shared.js loaded</div>')"
+  onerror="document.body.innerHTML='<pre style=&quot;padding:16px;color:#ecf6ff;background:#0a0f1c;font:14px system-ui&quot;>❌ FAILED TO LOAD: shared/shared.js\n\nCheck: /shared/shared.js exists in the repo and the file name is exactly &quot;shared.js&quot; (case-sensitive).</pre>'"
+></script>
 </body>
 </html>
