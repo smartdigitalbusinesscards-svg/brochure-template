@@ -1,16 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-tier="starter">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0f1c" />
   <title>Smart Digital Brochure</title>
 
   <style>
+    :root{
+      --bg:#0a0f1c;
+      --text:#ecf6ff;
+      --muted:rgba(236,246,255,.7);
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.14);
+      --accentA:#4fe3ff;
+      --accentB:#63ffb2;
+    }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#0a0f1c;
-      color:#ecf6ff;
+      background:var(--bg);
+      color:var(--text);
     }
     .wrap{
       max-width:980px;
@@ -19,10 +30,10 @@
     }
     h1{ font-size:28px; margin:0 0 6px; }
     h2{ margin:24px 0 10px; font-size:20px; }
-    .muted{ color:rgba(236,246,255,.7); }
+    .muted{ color:var(--muted); }
     .card{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.14);
+      background:var(--card);
+      border:1px solid var(--border);
       border-radius:18px;
       padding:18px;
       margin-top:18px;
@@ -38,13 +49,18 @@
       border-radius:14px;
       font-weight:800;
       text-decoration:none;
-      background: linear-gradient(90deg,#4fe3ff,#63ffb2);
+      background: linear-gradient(90deg,var(--accentA),var(--accentB));
       color:#031019;
       display:inline-block;
+      line-height:1;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn.secondary{
       background: rgba(255,255,255,.08);
-      color:#ecf6ff;
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:800;
     }
     .btn[aria-disabled="true"]{
       opacity:.45;
@@ -56,6 +72,7 @@
       color:rgba(236,246,255,.55);
       display:flex;
       justify-content:space-between;
+      gap:12px;
     }
 
     /* === TIER VISIBILITY CONTROL === */
@@ -63,6 +80,10 @@
     html[data-tier="pro"]   [data-tier="pro"]{ display:block; }
     html[data-tier="elite"] [data-tier="pro"],
     html[data-tier="elite"] [data-tier="elite"]{ display:block; }
+
+    /* Hide optional cards until JS enables them */
+    #bookingCard{ display:none; }
+    #eliteCtaWrap{ display:none; }
   </style>
 </head>
 
@@ -87,7 +108,7 @@
       </div>
     </div>
 
-    <!-- BOOKING (Starter+) -->
+    <!-- BOOKING (shows only if configured) -->
     <div class="card" id="bookingCard">
       <h2>Book an Appointment</h2>
       <a id="bookBtn" class="btn" href="#" aria-disabled="true">Schedule Now</a>
@@ -116,8 +137,8 @@
       </ul>
     </div>
 
-    <!-- ELITE CTA (only if configured) -->
-    <div class="card" id="eliteCtaWrap" style="display:none;">
+    <!-- ELITE CTA (shows only if configured + elite tier) -->
+    <div class="card" id="eliteCtaWrap">
       <h2 id="eliteCtaTitle">Exclusive Offer</h2>
       <a id="eliteCtaBtn" class="btn" href="#" aria-disabled="true">Elite Bonus</a>
     </div>
