@@ -65,16 +65,26 @@
   }
 
   function showTierSections(tier){
-    const showPro = (tier === "pro" || tier === "elite");
-    const showElite = (tier === "elite");
+  const showPro = (tier === "pro" || tier === "elite");
+  const showElite = (tier === "elite");
 
-    document.querySelectorAll('[data-tier="pro"]').forEach(el=>{
-      el.style.display = showPro ? "" : "none";
-    });
-    document.querySelectorAll('[data-tier="elite"]').forEach(el=>{
-      el.style.display = showElite ? "" : "none";
-    });
-  }
+  const show = (el) => {
+    const tag = (el.tagName || "").toLowerCase();
+    // badges + divs should be inline-flex-ish; list items should be flex
+    if (tag === "li") el.style.display = "flex";
+    else el.style.display = "inline-flex";
+  };
+
+  document.querySelectorAll('[data-tier="pro"]').forEach(el=>{
+    if (showPro) show(el);
+    else el.style.display = "none";
+  });
+
+  document.querySelectorAll('[data-tier="elite"]').forEach(el=>{
+    if (showElite) show(el);
+    else el.style.display = "none";
+  });
+}
 
   ready(function () {
     const B = window.BIZ || {};
