@@ -6,95 +6,68 @@
   <title>Smart Digital Brochure</title>
 
   <style>
-    body {
-      margin: 0;
+    body{
+      margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #0a0f1c;
-      color: #ecf6ff;
+      background:#0a0f1c;
+      color:#ecf6ff;
     }
-
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 32px 18px 80px;
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:32px 18px 80px;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 6px;
+    h1{ font-size:28px; margin:0 0 6px; }
+    h2{ margin:24px 0 10px; font-size:20px; }
+    .muted{ color:rgba(236,246,255,.7); }
+    .card{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:18px;
+      margin-top:18px;
     }
-
-    h2 {
-      margin-top: 32px;
-      font-size: 22px;
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:14px;
     }
-
-    .muted {
-      color: rgba(236,246,255,.7);
-    }
-
-    .card {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 18px;
-      padding: 18px;
-      margin-top: 18px;
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .btn {
-      padding: 14px 18px;
-      border-radius: 14px;
-      font-weight: 800;
-      text-decoration: none;
+    .btn{
+      padding:14px 18px;
+      border-radius:14px;
+      font-weight:800;
+      text-decoration:none;
       background: linear-gradient(90deg,#4fe3ff,#63ffb2);
-      color: #031019;
-      display: inline-block;
+      color:#031019;
+      display:inline-block;
     }
-
-    .btn.secondary {
+    .btn.secondary{
       background: rgba(255,255,255,.08);
-      color: #ecf6ff;
+      color:#ecf6ff;
+    }
+    .btn[aria-disabled="true"]{
+      opacity:.45;
+      pointer-events:none;
+    }
+    footer{
+      margin-top:40px;
+      font-size:12px;
+      color:rgba(236,246,255,.55);
+      display:flex;
+      justify-content:space-between;
     }
 
-    footer {
-      margin-top: 48px;
-      font-size: 12px;
-      color: rgba(236,246,255,.55);
-      display: flex;
-      justify-content: space-between;
-    }
-
-/* === TIER VISIBILITY CONTROL === */
-[data-tier] { 
-  display: none; 
-}
-
-html[data-tier="pro"] [data-tier="pro"] {
-  display: block;
-}
-
-html[data-tier="elite"] [data-tier="pro"],
-html[data-tier="elite"] [data-tier="elite"] {
-  display: block;
-}
-
-html[data-tier="starter"] [data-tier] {
-  display: none;
-} 
-    
+    /* === TIER VISIBILITY CONTROL === */
+    [data-tier]{ display:none; }
+    html[data-tier="pro"]   [data-tier="pro"]{ display:block; }
+    html[data-tier="elite"] [data-tier="pro"],
+    html[data-tier="elite"] [data-tier="elite"]{ display:block; }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-
     <!-- HEADER -->
     <h1 id="company">Company Name</h1>
     <div class="muted">
@@ -107,26 +80,29 @@ html[data-tier="starter"] [data-tier] {
     <div class="card">
       <h2>Contact</h2>
       <div class="row">
-        <a id="callBtn" class="btn secondary">Call</a>
-        <a id="textBtn" class="btn secondary">Text</a>
-        <a id="emailBtn" class="btn secondary">Email</a>
-        <a id="websiteBtn" class="btn secondary">Website</a>
+        <a id="callBtn" class="btn secondary" href="#" aria-disabled="true">Call</a>
+        <a id="textBtn" class="btn secondary" href="#" aria-disabled="true">Text</a>
+        <a id="emailBtn" class="btn secondary" href="#" aria-disabled="true">Email</a>
+        <a id="websiteBtn" class="btn secondary" href="#" aria-disabled="true">Website</a>
       </div>
     </div>
 
     <!-- BOOKING (Starter+) -->
-    <div class="card">
+    <div class="card" id="bookingCard">
       <h2>Book an Appointment</h2>
-      <a id="bookBtn" class="btn">Schedule Now</a>
+      <a id="bookBtn" class="btn" href="#" aria-disabled="true">Schedule Now</a>
+      <div class="muted" style="margin-top:10px;font-size:13px">
+        (Booking link will appear when configured.)
+      </div>
     </div>
 
     <!-- PRO FEATURES -->
     <div class="card" data-tier="pro">
       <h2>Pro Features</h2>
       <ul>
-        <li>Scan-ready brochure link</li>
-        <li>QR code sharing</li>
-        <li>Downloadable QR for print & signage</li>
+        <li>Expanded persuasion sections</li>
+        <li>Stronger offer layout + CTAs</li>
+        <li>Share/QR-ready structure</li>
       </ul>
     </div>
 
@@ -134,16 +110,16 @@ html[data-tier="starter"] [data-tier] {
     <div class="card" data-tier="elite">
       <h2>Elite Enhancements</h2>
       <ul>
-        <li>Custom Elite CTA</li>
-        <li>Priority setup & branding</li>
-        <li>Advanced automation support</li>
+        <li>Custom “Elite CTA” button (bonus offer / promo / link)</li>
+        <li>Priority setup + deeper branding polish</li>
+        <li>Automation-ready fields (best for scaling)</li>
       </ul>
     </div>
 
-    <!-- ELITE CTA -->
+    <!-- ELITE CTA (only if configured) -->
     <div class="card" id="eliteCtaWrap" style="display:none;">
-      <h2>Exclusive Offer</h2>
-      <a id="eliteCtaBtn" class="btn">Elite Bonus</a>
+      <h2 id="eliteCtaTitle">Exclusive Offer</h2>
+      <a id="eliteCtaBtn" class="btn" href="#" aria-disabled="true">Elite Bonus</a>
     </div>
 
     <footer>
@@ -153,29 +129,7 @@ html[data-tier="starter"] [data-tier] {
   </div>
 
   <!-- REQUIRED SHARED LOGIC -->
-  <script>
-    // TEMP debug: show JS errors on-screen (so we don't need DevTools)
-    window.onerror = function (msg, src, line, col, err) {
-      document.body.innerHTML =
-        "<pre style='white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff'>" +
-        "JS ERROR:\n" + msg + "\n\n" +
-        (src ? ("FILE: " + src + "\n") : "") +
-        (line ? ("LINE: " + line + ":" + col + "\n\n") : "") +
-        (err && err.stack ? err.stack : "") +
-        "</pre>";
-    };
-  </script>
-
-  <script
-  src="shared/config.js"
-  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;left:10px;bottom:10px;z-index:99999;background:#0a0f1c;border:1px solid #4fe3ff;color:#ecf6ff;padding:8px 10px;border-radius:10px;font:12px system-ui&quot;>config.js ✅</div>')"
-  onerror="document.body.innerHTML='<pre style=&quot;white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff&quot;>FAILED TO LOAD: shared/config.js</pre>'"
-></script>
-
-<script
-  src="shared/shared.js"
-  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;left:10px;bottom:46px;z-index:99999;background:#0a0f1c;border:1px solid #63ffb2;color:#ecf6ff;padding:8px 10px;border-radius:10px;font:12px system-ui&quot;>shared.js ✅</div>')"
-  onerror="document.body.innerHTML='<pre style=&quot;white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff&quot;>FAILED TO LOAD: shared/shared.js</pre>'"
-></script>
+  <script src="shared/config.js"></script>
+  <script src="shared/shared.js"></script>
 </body>
 </html>
