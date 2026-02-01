@@ -78,7 +78,9 @@
 
   ready(function () {
     const B = window.BIZ || {};
-    const tier = String(B.tier || "starter").toLowerCase().trim();
+    // URL tier override: ?tier=starter|pro|elite
+const urlTier = new URL(window.location.href).searchParams.get("tier");
+const tier = String(urlTier || B.tier || "starter").toLowerCase().trim();
 
     // Tier badge text
     const tierBadge = document.getElementById("tierBadge");
