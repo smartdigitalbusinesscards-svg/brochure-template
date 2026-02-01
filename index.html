@@ -1,1 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Digital Brochure</title>
 
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0a0f1c;
+      color: #ecf6ff;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 18px 80px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      margin-top: 32px;
+      font-size: 22px;
+    }
+
+    .muted {
+      color: rgba(236,246,255,.7);
+    }
+
+    .card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      background: linear-gradient(90deg,#4fe3ff,#63ffb2);
+      color: #031019;
+      display: inline-block;
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+      color: #ecf6ff;
+    }
+
+    footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: rgba(236,246,255,.55);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- HEADER -->
+    <h1 id="company">Company Name</h1>
+    <div class="muted">
+      <span id="fullName">Your Name</span> ·
+      <span id="title">Title</span> ·
+      <span id="city">City</span>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="card">
+      <h2>Contact</h2>
+      <div class="row">
+        <a id="callBtn" class="btn secondary">Call</a>
+        <a id="textBtn" class="btn secondary">Text</a>
+        <a id="emailBtn" class="btn secondary">Email</a>
+        <a id="websiteBtn" class="btn secondary">Website</a>
+      </div>
+    </div>
+
+    <!-- BOOKING (Starter+) -->
+    <div class="card">
+      <h2>Book an Appointment</h2>
+      <a id="bookBtn" class="btn">Schedule Now</a>
+    </div>
+
+    <!-- PRO FEATURES -->
+    <div class="card" data-tier="pro">
+      <h2>Pro Features</h2>
+      <ul>
+        <li>Scan-ready brochure link</li>
+        <li>QR code sharing</li>
+        <li>Downloadable QR for print & signage</li>
+      </ul>
+    </div>
+
+    <!-- ELITE FEATURES -->
+    <div class="card" data-tier="elite">
+      <h2>Elite Enhancements</h2>
+      <ul>
+        <li>Custom Elite CTA</li>
+        <li>Priority setup & branding</li>
+        <li>Advanced automation support</li>
+      </ul>
+    </div>
+
+    <!-- ELITE CTA -->
+    <div class="card" id="eliteCtaWrap" style="display:none;">
+      <h2>Exclusive Offer</h2>
+      <a id="eliteCtaBtn" class="btn">Elite Bonus</a>
+    </div>
+
+    <footer>
+      <div>Smart Digital Brochure</div>
+      <div id="tierBadge">Starter</div>
+    </footer>
+  </div>
+
+  <!-- REQUIRED SHARED LOGIC -->
+  <script src="shared/config.js"></script>
+  <script src="shared/shared.js"></script>
+</body>
+</html>
