@@ -168,14 +168,14 @@ html[data-tier="starter"] [data-tier] {
 
   <script
   src="shared/config.js"
-  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;bottom:10px;left:10px;z-index:9999;background:#111a;color:#ecf6ff;padding:8px 10px;border:1px solid #4fe3ff55;border-radius:10px;font:12px system-ui&quot;>✅ config.js loaded<br>tier: '+(window.BIZ?.tier||'MISSING')+'</div>')"
-  onerror="document.body.innerHTML='<pre style=&quot;padding:16px;color:#ecf6ff;background:#0a0f1c;font:14px system-ui&quot;>❌ FAILED TO LOAD: shared/config.js\n\nCheck: /shared/config.js exists in the repo and the folder name is exactly &quot;shared&quot; (case-sensitive).</pre>'"
+  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;left:10px;bottom:10px;z-index:99999;background:#0a0f1c;border:1px solid #4fe3ff;color:#ecf6ff;padding:8px 10px;border-radius:10px;font:12px system-ui&quot;>config.js ✅</div>')"
+  onerror="document.body.innerHTML='<pre style=&quot;white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff&quot;>FAILED TO LOAD: shared/config.js</pre>'"
 ></script>
 
 <script
   src="shared/shared.js"
-  onload="document.body.insertAdjacentHTML('beforeend','<div style=&quot;position:fixed;bottom:10px;right:10px;z-index:9999;background:#111a;color:#ecf6ff;padding:8px 10px;border:1px solid #63ffb255;border-radius:10px;font:12px system-ui&quot;>✅ shared.js loaded</div>')"
-  onerror="document.body.innerHTML='<pre style=&quot;padding:16px;color:#ecf6ff;background:#0a0f1c;font:14px system-ui&quot;>❌ FAILED TO LOAD: shared/shared.js\n\nCheck: /shared/shared.js exists in the repo and the file name is exactly &quot;shared.js&quot; (case-sensitive).</pre>'"
+  onload="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:fixed;left:10px;bottom:46px;z-index:99999;background:#0a0f1c;border:1px solid #63ffb2;color:#ecf6ff;padding:8px 10px;border-radius:10px;font:12px system-ui&quot;>shared.js ✅</div>')"
+  onerror="document.body.innerHTML='<pre style=&quot;white-space:pre-wrap;padding:16px;font:14px/1.4 system-ui;background:#0a0f1c;color:#ecf6ff&quot;>FAILED TO LOAD: shared/shared.js</pre>'"
 ></script>
 </body>
 </html>
