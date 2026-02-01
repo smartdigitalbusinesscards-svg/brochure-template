@@ -70,6 +70,21 @@
       display: flex;
       justify-content: space-between;
     }
+
+/* === TIER VISIBILITY CONTROL === */
+[data-tier] { 
+  display: none; 
+}
+
+html[data-tier="pro"] [data-tier="pro"] {
+  display: block;
+}
+
+html[data-tier="elite"] [data-tier="pro"],
+html[data-tier="elite"] [data-tier="elite"] {
+  display: block;
+}
+    
   </style>
 </head>
 
