@@ -47,7 +47,7 @@ window.BIZ = {
 
   // Elite CTA (elite only)
   eliteCtaLabel: "Claim Elite Offer",
-  eliteCtaUrl: "REPLACE_ELITE_CTA_URL",
+  eliteCtaUrl: "https://selectsourcewater.com",
 
   // Footer/Watermark
   footerPill: "Send this link to your referral partner — mobile friendly",
