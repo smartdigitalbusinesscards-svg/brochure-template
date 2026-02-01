@@ -12,7 +12,7 @@ window.BIZ = {
   email: "test@example.com",
   website: "selectsourcewater.com",
 
-  bookingLink: "REPLACE_BOOKING_LINK",
+  bookingLink: "REPLACE_BOOKING_LINK",           // ← will be treated as unset
   textPrefill: "Hi! I just checked out your Smart Digital Brochure. Quick question:",
 
   eliteCtaTitle: "REPLACE_ELITE_CTA_TITLE",
