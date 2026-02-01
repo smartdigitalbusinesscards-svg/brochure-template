@@ -4,17 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#04151f" />
-  <title id="pageTitle">Smart Digital Brochure</title>
+  <title>Smart Digital Brochure</title>
 
   <style>
     :root{
       --bgA:#04151f;
       --bgB:#0a2f3f;
-      --glass: rgba(255,255,255,.085);
-      --glass2: rgba(255,255,255,.055);
-      --border: rgba(255,255,255,.16);
+      --card: rgba(255,255,255,0.085);
+      --card2: rgba(255,255,255,0.055);
+      --border: rgba(255,255,255,0.16);
       --text:#ecf6ff;
-      --muted: rgba(236,246,255,.74);
+      --muted: rgba(236,246,255,0.74);
       --accent:#4fe3ff;
       --accent2:#63ffb2;
       --shadow: 0 18px 55px rgba(0,0,0,.48);
@@ -34,6 +34,7 @@
       overflow-x:hidden;
     }
 
+    /* Water background drift */
     .water{
       position:fixed; inset:-70px;
       background:
@@ -44,19 +45,18 @@
       animation: drift 12s ease-in-out infinite alternate;
       pointer-events:none;
       opacity:.92;
-      z-index:0;
     }
     @keyframes drift{
       from{ transform: translate3d(-12px,-10px,0) scale(1.02); }
-      to{ transform: translate3d(14px,12px,0) scale(1.06); }
+      to  { transform: translate3d(14px,12px,0) scale(1.06); }
     }
 
     .wrap{
-      position:relative;
-      z-index:1;
       max-width:1120px;
       margin:0 auto;
       padding:26px 18px 44px;
+      position:relative;
+      z-index:1;
     }
 
     header{
@@ -110,21 +110,24 @@
     }
 
     .card{
-      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      background: linear-gradient(180deg, var(--card), var(--card2));
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
-      overflow:hidden;
     }
 
+    /* IMAGE CARD */
     .imgCard{
       padding:12px;
+      position:relative;
+      overflow:hidden;
     }
     .imgBtn{
       all:unset;
       display:block;
       cursor: zoom-in;
+      width:100%;
     }
     img{
       width:100%;
@@ -143,12 +146,14 @@
       align-items:center;
     }
     .dot{
-      width:8px; height:8px;
+      width:8px;
+      height:8px;
       border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
       box-shadow:0 0 12px rgba(79,227,255,.55);
     }
 
+    /* INFO CARD */
     .infoCard{ padding:22px; }
 
     .priceRow{
@@ -164,6 +169,7 @@
       text-transform:uppercase;
       color:var(--muted);
     }
+
     .priceValue{
       position:relative;
       display:inline-block;
@@ -173,17 +179,30 @@
       -webkit-background-clip:text;
       background-clip:text;
       color:transparent;
+      overflow:hidden;
     }
+
+    /* Shine sweep */
     .priceValue.shine-once::after{
       content:"";
       position:absolute;
-      top:-25%; left:-140%;
-      width:70%; height:160%;
+      top:-25%;
+      left:-140%;
+      width:70%;
+      height:160%;
       transform: skewX(-18deg);
-      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 45%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 45%,
+        rgba(255,255,255,0) 100%
+      );
       animation: priceShine 900ms ease-out 1;
     }
-    @keyframes priceShine{ from{ left:-140%; } to{ left:140%; } }
+    @keyframes priceShine{
+      from{ left:-140%; }
+      to{ left:140%; }
+    }
 
     .pill{
       border:1px solid rgba(255,255,255,.12);
@@ -192,39 +211,50 @@
       border-radius:999px;
       font-size:12px;
       color:var(--muted);
+      display:inline-block;
     }
 
     ul{
-      margin:0; padding:0; list-style:none;
-      display:grid; gap:12px;
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:12px;
     }
     li{
-      display:flex; gap:10px; align-items:flex-start;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
       padding:14px 14px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.12);
     }
     .check{
-      width:22px; height:22px;
+      width:22px;
+      height:22px;
       border-radius:8px;
       background: radial-gradient(circle at 30% 30%, #fff, rgba(79,227,255,.35));
       border:1px solid rgba(255,255,255,.18);
       box-shadow:0 0 18px rgba(79,227,255,.22);
-      display:grid; place-items:center;
-      font-size:14px; flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      font-size:14px;
+      flex:0 0 auto;
     }
     .liText{ font-size:14px; }
 
     .ctaRow{
       display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap:12px;
       margin-top:22px;
     }
 
+    /* Buttons + Ripple */
     .btn{
-      position:relative; overflow:hidden;
+      position:relative;
+      overflow:hidden;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.14);
       color:var(--text);
@@ -236,7 +266,10 @@
       transition:transform .12s ease, border-color .12s ease;
       -webkit-tap-highlight-color: transparent;
       user-select:none;
-      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
     }
     .btn:hover{ transform:translateY(-1px); border-color: rgba(255,255,255,.22); }
     .btn.primary{
@@ -244,11 +277,9 @@
       color:#021018;
       border:none;
     }
-    .btn[aria-disabled="true"],
-    .btn.disabled{
+    .btn[aria-disabled="true"]{
       opacity:.45;
       pointer-events:none;
-      cursor:not-allowed;
     }
 
     .ripple{
@@ -259,7 +290,9 @@
       background: rgba(255,255,255,.35);
       pointer-events:none;
     }
-    @keyframes ripple{ to{ transform: scale(1); opacity:0; } }
+    @keyframes ripple{
+      to{ transform: scale(1); opacity:0; }
+    }
 
     footer{
       margin-top:20px;
@@ -281,19 +314,25 @@
       color: rgba(236,246,255,.35);
     }
 
+    /* MODAL */
     .modal{
-      position:fixed; inset:0;
+      position:fixed;
+      inset:0;
       background:rgba(0,0,0,.75);
       display:none;
-      align-items:center; justify-content:center;
-      z-index:9999; padding:16px;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:16px;
     }
     .modal.open{ display:flex; }
     .modalInner{
       background:#060e14;
       border-radius:16px;
-      max-width:1100px; width:100%;
-      max-height:92vh; overflow:auto;
+      max-width:1100px;
+      width:100%;
+      max-height:92vh;
+      overflow:auto;
       padding:12px;
       border:1px solid rgba(255,255,255,.12);
       box-shadow: 0 22px 80px rgba(0,0,0,.65);
@@ -305,73 +344,99 @@
       border:1px solid rgba(255,255,255,.10);
     }
 
-    @media (prefers-reduced-motion: reduce){
-      .water, .priceValue.shine-once::after { animation:none !important; }
-    }
+    /* Tier sections default hidden; JS reveals them safely */
+    [data-tier]{ display:none; }
+    #eliteCtaBtnWrap{ display:none; }
+    #bookingBtnWrap{ display:none; }
   </style>
 </head>
+
 <body>
-  <div class="water"></div>
+<div class="water"></div>
 
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="kicker" id="companyKicker">Company Name</div>
-        <h1 id="productTitle">Product Name</h1>
-      </div>
-
-      <div class="badgeRow" id="badgeRow">
-        <!-- Badges populated by JS if pro/elite -->
-      </div>
-    </header>
-
-    <div class="grid">
-      <section class="card imgCard">
-        <button class="imgBtn" id="openModal" aria-label="Zoom brochure">
-          <img id="brochureImg" src="brochure.png" alt="Product Brochure" loading="lazy">
-        </button>
-        <div class="imgHint">
-          <span class="dot"></span> Tap the brochure to zoom in.
-        </div>
-      </section>
-
-      <section class="card infoCard">
-        <div class="priceRow">
-          <div>
-            <div class="priceLabel">Total Price</div>
-            <div class="priceValue" id="priceValue">$ --</div>
-          </div>
-          <div class="pill">One-time total</div>
-        </div>
-
-        <ul id="featuresList">
-          <!-- Dynamic <li> inserted by JS -->
-        </ul>
-
-        <div class="ctaRow">
-          <a class="btn primary" id="viewBrochureBtn">View Brochure</a>
-          <a class="btn" id="textBtn" href="#" aria-disabled="true">Text</a>
-          <a class="btn" id="callBtn" href="#" aria-disabled="true">Call</a>
-          <a class="btn" id="websiteBtn" href="#" target="_blank" aria-disabled="true">Website</a>
-        </div>
-      </section>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="kicker" id="kicker">Company Name</div>
+      <h1 id="headline">Brochure Headline</h1>
+      <div class="pill" style="margin-top:8px;" id="sublinePill">Your Name · Title · City</div>
     </div>
 
-    <footer>
-      <div class="pill">Send this link to your referral partner — mobile friendly</div>
-      <div>© <span id="year">2026</span> <span id="companyFooter">Select Source Water</span></div>
-    </footer>
-
-    <div class="watermark" id="watermark">Installed by <span id="companyWatermark">Select Source Water</span></div>
-  </div>
-
-  <div class="modal" id="modal">
-    <div class="modalInner">
-      <img class="modalImg" id="modalImg" src="brochure.png" alt="Enlarged Brochure">
+    <div class="badgeRow" id="badgeRow">
+      <div class="badge" id="badge1">Badge 1</div>
+      <div class="badge" id="badge2">Badge 2</div>
+      <div class="badge" id="badge3">Badge 3</div>
+      <div class="badge" id="badge4">Badge 4</div>
+      <div class="badge" id="badgePro" data-tier="pro">Pro Badge</div>
+      <div class="badge" id="badgeElite" data-tier="elite">Elite Badge</div>
     </div>
+  </header>
+
+  <div class="grid">
+    <!-- BROCHURE IMAGE -->
+    <section class="card imgCard">
+      <button class="imgBtn" id="openModal">
+        <img id="brochureImg" src="brochure.png" alt="Digital Brochure">
+      </button>
+      <div class="imgHint">
+        <span class="dot"></span> Tap the brochure to zoom in.
+      </div>
+    </section>
+
+    <!-- DETAILS -->
+    <section class="card infoCard">
+      <div class="priceRow">
+        <div>
+          <div class="priceLabel" id="priceLabel">Total Price</div>
+          <div class="priceValue" id="priceValue">$0</div>
+        </div>
+        <div class="pill" id="pricePill">One-time total</div>
+      </div>
+
+      <ul id="featureList">
+        <li><span class="check">✓</span><span class="liText" id="feat1">Feature 1</span></li>
+        <li><span class="check">✓</span><span class="liText" id="feat2">Feature 2</span></li>
+        <li><span class="check">✓</span><span class="liText" id="feat3">Feature 3</span></li>
+        <li><span class="check">✓</span><span class="liText" id="feat4">Feature 4</span></li>
+
+        <li data-tier="pro"><span class="check">✓</span><span class="liText" id="featPro">Pro Feature</span></li>
+        <li data-tier="elite"><span class="check">✓</span><span class="liText" id="featElite">Elite Feature</span></li>
+      </ul>
+
+      <div class="ctaRow">
+        <a class="btn primary" href="#" id="viewBrochureBtn">View Brochure</a>
+
+        <a class="btn" href="#" id="textBtn" aria-disabled="true">Text</a>
+        <a class="btn" href="#" id="callBtn" aria-disabled="true">Call</a>
+        <a class="btn" href="#" id="websiteBtn" aria-disabled="true" target="_blank" rel="noopener">Website</a>
+
+        <span id="bookingBtnWrap">
+          <a class="btn" href="#" id="bookBtn" aria-disabled="true">Book</a>
+        </span>
+
+        <span id="eliteCtaBtnWrap">
+          <a class="btn primary" href="#" id="eliteCtaBtn" aria-disabled="true">Elite Offer</a>
+        </span>
+      </div>
+    </section>
   </div>
 
-  <script src="shared/config.js"></script>
-  <script src="shared/shared.js"></script>
+  <footer>
+    <div class="pill" id="footerPill">Send this link to your referral partner — mobile friendly</div>
+    <div id="tierBadge">Starter</div>
+  </footer>
+
+  <div class="watermark" id="watermarkText">Installed by Company Name</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modalInner">
+    <img class="modalImg" id="modalImg" src="brochure.png" alt="Brochure Zoom">
+  </div>
+</div>
+
+<script src="shared/config.js"></script>
+<script src="shared/shared.js"></script>
 </body>
 </html>
