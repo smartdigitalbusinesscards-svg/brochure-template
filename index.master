@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0f1c" />
+  <title>Smart Digital Brochure</title>
+
+  <style>
+    :root{
+      --bg:#0a0f1c;
+      --text:#ecf6ff;
+      --muted:rgba(236,246,255,.7);
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.14);
+      --accentA:#4fe3ff;
+      --accentB:#63ffb2;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:32px 18px 80px;
+    }
+    h1{ font-size:28px; margin:0 0 6px; }
+    h2{ margin:24px 0 10px; font-size:20px; }
+    .muted{ color:var(--muted); }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:18px;
+      margin-top:18px;
+    }
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:14px;
+    }
+    .btn{
+      padding:14px 18px;
+      border-radius:14px;
+      font-weight:800;
+      text-decoration:none;
+      background: linear-gradient(90deg,var(--accentA),var(--accentB));
+      color:#031019;
+      display:inline-block;
+      line-height:1;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:800;
+    }
+    .btn[aria-disabled="true"],
+    .btn.disabled{
+      opacity:.45;
+      pointer-events:none;
+      cursor:not-allowed;
+    }
+    footer{
+      margin-top:40px;
+      font-size:12px;
+      color:rgba(236,246,255,.55);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    /* Hide optional cards until JS enables them */
+    #bookingCard{ display:none; }
+    #eliteCtaWrap{ display:none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <h1 id="company">Company Name</h1>
+    <div class="muted">
+      <span id="fullName">Your Name</span> ·
+      <span id="title">Title</span> ·
+      <span id="city">City</span>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="card">
+      <h2>Contact</h2>
+      <div class="row">
+        <a id="callBtn" class="btn secondary" href="#" aria-disabled="true">Call</a>
+        <a id="textBtn" class="btn secondary" href="#" aria-disabled="true">Text</a>
+        <a id="emailBtn" class="btn secondary" href="#" aria-disabled="true">Email</a>
+        <a id="websiteBtn" class="btn secondary" href="#" aria-disabled="true">Website</a>
+      </div>
+    </div>
+
+    <!-- BOOKING (shows only if configured) -->
+    <div class="card" id="bookingCard">
+      <h2>Book an Appointment</h2>
+      <a id="bookBtn" class="btn" href="#" aria-disabled="true">Schedule Now</a>
+      <div class="muted" style="margin-top:10px;font-size:13px">
+        (Booking link will appear when configured.)
+      </div>
+    </div>
+
+    <!-- PRO FEATURES -->
+    <div class="card" data-tier="pro">
+      <h2>Pro Features</h2>
+      <ul>
+        <li>Expanded persuasion sections</li>
+        <li>Stronger offer layout + CTAs</li>
+        <li>Share/QR-ready structure</li>
+      </ul>
+    </div>
+
+    <!-- ELITE FEATURES -->
+    <div class="card" data-tier="elite">
+      <h2>Elite Enhancements</h2>
+      <ul>
+        <li>Custom “Elite CTA” button (bonus offer / promo / link)</li>
+        <li>Priority setup + deeper branding polish</li>
+        <li>Automation-ready fields (best for scaling)</li>
+      </ul>
+    </div>
+
+    <!-- ELITE CTA (shows only if configured + elite tier) -->
+    <div class="card" id="eliteCtaWrap">
+      <h2 id="eliteCtaTitle">Exclusive Offer</h2>
+      <a id="eliteCtaBtn" class="btn" href="#" aria-disabled="true">Elite Bonus</a>
+    </div>
+
+    <footer>
+      <div>Smart Digital Brochure</div>
+      <div id="tierBadge">Starter</div>
+    </footer>
+  </div>
+
+  <!-- REQUIRED SHARED LOGIC -->
+  <script src="shared/config.js"></script>
+  <script src="shared/shared.js"></script>
+</body>
+</html>
