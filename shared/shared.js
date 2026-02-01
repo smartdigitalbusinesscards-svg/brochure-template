@@ -6,7 +6,7 @@ document.documentElement.setAttribute("data-tier", (window.BIZ?.tier || "starter
   
   // --- Helpers ---
   const B = window.BIZ || {};
-  const qs = (sel, root = document) => root.querySelector(sel);
+  const qs = (sel, root) => (root || document).querySelector(sel);
 
   const safe = (v, fallback = "") => {
     if (v === undefined || v === null) return fallback;
