@@ -2,83 +2,64 @@
 (function () {
   "use strict";
 
-  // --- Safe helpers ---
-  const B = (window.BIZ && typeof window.BIZ === "object") ? window.BIZ : {};
-  const safe = (v, fallback = "") => {
-    if (v === undefined || v === null) return fallback;
-    const s = String(v).trim();
-    return s.length ? s : fallback;
-  };
-  const byId = (id) => document.getElementById(id);
-
-  // --- Tier (controls visibility CSS) ---
-  const tier = safe(B.tier, "starter").toLowerCase();
-  const tierClean = (tier === "pro" || tier === "elite") ? tier : "starter";
-  document.documentElement.setAttribute("data-tier", tierClean);
-  const tierBadge = byId("tierBadge");
-  if (tierBadge) tierBadge.textContent = tierClean.charAt(0).toUpperCase() + tierClean.slice(1);
-
-  // --- Text fields ---
-  const company = safe(B.company, "Company Name");
-  const fullName = safe(B.fullName, "Your Name");
-  const title = safe(B.title, "Title");
-  const city = safe(B.city, "City");
-
-  const companyEl = byId("company");
-  const fullNameEl = byId("fullName");
-  const titleEl = byId("title");
-  const cityEl = byId("city");
-
-  if (companyEl) companyEl.textContent = company;
-  if (fullNameEl) fullNameEl.textContent = fullName;
-  if (titleEl) titleEl.textContent = title;
-  if (cityEl) cityEl.textContent = city;
-
-  // --- Link setter (never blank-screen) ---
-  function setLink(id, href, label) {
-    const a = byId(id);
-    if (!a) return;
-    if (!href || href.includes("REPLACE_")) {
-      a.setAttribute("aria-disabled", "true");
-      a.setAttribute("href", "#");
-      return;
+  function ready(fn) {
+    if (document.readyState !== "loading") {
+      fn();
+    } else {
+      document.addEventListener("DOMContentLoaded", fn);
     }
-    a.setAttribute("aria-disabled", "false");
-    a.setAttribute("href", href);
-    a.setAttribute("target", "_blank");
-    a.setAttribute("rel", "noopener");
-    if (label) a.textContent = label;
   }
 
-  // --- Contact buttons ---
-  const phoneTel = safe(B.phoneTel, "");
-  const phonePretty = safe(B.phonePretty, "");
-  const email = safe(B.email, "");
-  const website = safe(B.website, "");
+  ready(function () {
+    const B = window.BIZ || {};
+    const tier = (B.tier || "starter").toLowerCase();
 
-  setLink("callBtn", phoneTel ? ("tel:" + phoneTel) : "", "Call" + (phonePretty ? (" " + phonePretty) : ""));
-  setLink("textBtn", phoneTel ? ("sms:" + phoneTel + "?&body=" + encodeURIComponent(safe(B.textPrefill, ""))) : "", "Text");
-  setLink("emailBtn", email ? ("mailto:" + email) : "", "Email");
-  setLink("websiteBtn", website ? website : "", "Website");
+    // Set tier on <html> for CSS visibility rules
+    document.documentElement.setAttribute("data-tier", tier);
 
-  // --- Booking ---
-  const booking = safe(B.bookingLink, "");
-  setLink("bookBtn", booking ? booking : "", "Schedule Now");
+    const qs = (id) => document.getElementById(id);
 
-  // --- Elite CTA (only if elite + provided) ---
-  const eliteWrap = byId("eliteCtaWrap");
-  const eliteBtn = byId("eliteCtaBtn");
-  const eliteLabel = safe(B.eliteCtaLabel, "");
-  const eliteUrl = safe(B.eliteCtaUrl, "");
+    const setText = (id, value) => {
+      const el = qs(id);
+      if (el && value) el.textContent = value;
+    };
 
-  if (tierClean === "elite" && eliteWrap && eliteBtn && eliteLabel && eliteUrl && !eliteUrl.includes("REPLACE_")) {
-    eliteWrap.style.display = "block";
-    eliteBtn.textContent = eliteLabel;
-    eliteBtn.setAttribute("aria-disabled", "false");
-    eliteBtn.setAttribute("href", eliteUrl);
-    eliteBtn.setAttribute("target", "_blank");
-    eliteBtn.setAttribute("rel", "noopener");
-  } else if (eliteWrap) {
-    eliteWrap.style.display = "none";
-  }
+    const setLink = (id, href, label) => {
+      const el = qs(id);
+      if (!el) return;
+
+      if (!href || href.includes("REPLACE_")) {
+        el.setAttribute("aria-disabled", "true");
+        el.removeAttribute("href");
+        return;
+      }
+
+      el.setAttribute("href", href);
+      el.removeAttribute("aria-disabled");
+      if (label) el.textContent = label;
+    };
+
+    // Text fields
+    setText("company", B.company);
+    setText("fullName", B.fullName);
+    setText("title", B.title);
+    setText("city", B.city);
+    setText("tierBadge", tier.charAt(0).toUpperCase() + tier.slice(1));
+
+    // Contact links
+    setLink("callBtn", B.phoneTel ? `tel:${B.phoneTel}` : "");
+    setLink("textBtn", B.phoneTel ? `sms:${B.phoneTel}` : "");
+    setLink("emailBtn", B.email ? `mailto:${B.email}` : "");
+    setLink("websiteBtn", B.website);
+
+    // Booking
+    setLink("bookBtn", B.bookingLink);
+
+    // Elite CTA
+    if (tier === "elite" && B.eliteCtaUrl && !B.eliteCtaUrl.includes("REPLACE_")) {
+      const wrap = qs("eliteCtaWrap");
+      if (wrap) wrap.style.display = "block";
+      setLink("eliteCtaBtn", B.eliteCtaUrl, B.eliteCtaLabel || "Elite Bonus");
+    }
+  });
 })();
