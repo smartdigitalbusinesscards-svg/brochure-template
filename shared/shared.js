@@ -1,61 +1,84 @@
 // shared/shared.js
 (function () {
-  // 1) Always set tier on <html> so CSS tier rules can work
-  var tier = (window.BIZ && window.BIZ.tier) ? window.BIZ.tier : "starter";
-  document.documentElement.setAttribute("data-tier", tier);
+  "use strict";
 
-  // 2) Helper to safely set text
-  function setText(id, value) {
-    var el = document.getElementById(id);
-    if (el && value != null) el.textContent = value;
-  }
+  // --- Safe helpers ---
+  const B = (window.BIZ && typeof window.BIZ === "object") ? window.BIZ : {};
+  const safe = (v, fallback = "") => {
+    if (v === undefined || v === null) return fallback;
+    const s = String(v).trim();
+    return s.length ? s : fallback;
+  };
+  const byId = (id) => document.getElementById(id);
 
-  // 3) Helper to safely set links
-  function setLink(id, href) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    if (!href) {
-      el.setAttribute("aria-disabled", "true");
-      el.style.opacity = "0.55";
-      el.style.pointerEvents = "none";
-      el.removeAttribute("href");
+  // --- Tier (controls visibility CSS) ---
+  const tier = safe(B.tier, "starter").toLowerCase();
+  const tierClean = (tier === "pro" || tier === "elite") ? tier : "starter";
+  document.documentElement.setAttribute("data-tier", tierClean);
+  const tierBadge = byId("tierBadge");
+  if (tierBadge) tierBadge.textContent = tierClean.charAt(0).toUpperCase() + tierClean.slice(1);
+
+  // --- Text fields ---
+  const company = safe(B.company, "Company Name");
+  const fullName = safe(B.fullName, "Your Name");
+  const title = safe(B.title, "Title");
+  const city = safe(B.city, "City");
+
+  const companyEl = byId("company");
+  const fullNameEl = byId("fullName");
+  const titleEl = byId("title");
+  const cityEl = byId("city");
+
+  if (companyEl) companyEl.textContent = company;
+  if (fullNameEl) fullNameEl.textContent = fullName;
+  if (titleEl) titleEl.textContent = title;
+  if (cityEl) cityEl.textContent = city;
+
+  // --- Link setter (never blank-screen) ---
+  function setLink(id, href, label) {
+    const a = byId(id);
+    if (!a) return;
+    if (!href || href.includes("REPLACE_")) {
+      a.setAttribute("aria-disabled", "true");
+      a.setAttribute("href", "#");
       return;
     }
-    el.setAttribute("aria-disabled", "false");
-    el.style.opacity = "";
-    el.style.pointerEvents = "";
-    el.setAttribute("href", href);
+    a.setAttribute("aria-disabled", "false");
+    a.setAttribute("href", href);
+    a.setAttribute("target", "_blank");
+    a.setAttribute("rel", "noopener");
+    if (label) a.textContent = label;
   }
 
-  // ---- Fill header ----
-  setText("company", window.BIZ && window.BIZ.company);
-  setText("fullName", window.BIZ && window.BIZ.fullName);
-  setText("title", window.BIZ && window.BIZ.title);
-  setText("city", window.BIZ && window.BIZ.city);
+  // --- Contact buttons ---
+  const phoneTel = safe(B.phoneTel, "");
+  const phonePretty = safe(B.phonePretty, "");
+  const email = safe(B.email, "");
+  const website = safe(B.website, "");
 
-  // ---- Buttons ----
-  var phoneTel = window.BIZ && window.BIZ.phoneTel;
-  var email = window.BIZ && window.BIZ.email;
-  var website = window.BIZ && window.BIZ.website;
-  var bookingLink = window.BIZ && window.BIZ.bookingLink;
+  setLink("callBtn", phoneTel ? ("tel:" + phoneTel) : "", "Call" + (phonePretty ? (" " + phonePretty) : ""));
+  setLink("textBtn", phoneTel ? ("sms:" + phoneTel + "?&body=" + encodeURIComponent(safe(B.textPrefill, ""))) : "", "Text");
+  setLink("emailBtn", email ? ("mailto:" + email) : "", "Email");
+  setLink("websiteBtn", website ? website : "", "Website");
 
-  setLink("callBtn", phoneTel ? ("tel:" + phoneTel) : "");
-  setLink("textBtn", phoneTel ? ("sms:" + phoneTel + ((window.BIZ && window.BIZ.textPrefill) ? ("?body=" + encodeURIComponent(window.BIZ.textPrefill)) : "")) : "");
-  setLink("emailBtn", email ? ("mailto:" + email) : "");
-  setLink("websiteBtn", website || "");
-  setLink("bookBtn", bookingLink || "");
+  // --- Booking ---
+  const booking = safe(B.bookingLink, "");
+  setLink("bookBtn", booking ? booking : "", "Schedule Now");
 
-  // ---- Elite CTA ----
-  var eliteWrap = document.getElementById("eliteCtaWrap");
-  var eliteBtn = document.getElementById("eliteCtaBtn");
-  if (eliteWrap && eliteBtn && tier === "elite") {
+  // --- Elite CTA (only if elite + provided) ---
+  const eliteWrap = byId("eliteCtaWrap");
+  const eliteBtn = byId("eliteCtaBtn");
+  const eliteLabel = safe(B.eliteCtaLabel, "");
+  const eliteUrl = safe(B.eliteCtaUrl, "");
+
+  if (tierClean === "elite" && eliteWrap && eliteBtn && eliteLabel && eliteUrl && !eliteUrl.includes("REPLACE_")) {
     eliteWrap.style.display = "block";
-    eliteBtn.textContent = (window.BIZ && window.BIZ.eliteCtaLabel) ? window.BIZ.eliteCtaLabel : "Elite Bonus";
-    setLink("eliteCtaBtn", (window.BIZ && window.BIZ.eliteCtaUrl) ? window.BIZ.eliteCtaUrl : "");
+    eliteBtn.textContent = eliteLabel;
+    eliteBtn.setAttribute("aria-disabled", "false");
+    eliteBtn.setAttribute("href", eliteUrl);
+    eliteBtn.setAttribute("target", "_blank");
+    eliteBtn.setAttribute("rel", "noopener");
   } else if (eliteWrap) {
     eliteWrap.style.display = "none";
   }
-
-  // ---- Tier badge ----
-  setText("tierBadge", tier.charAt(0).toUpperCase() + tier.slice(1));
 })();
