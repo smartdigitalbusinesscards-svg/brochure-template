@@ -1,55 +1,59 @@
-// shared/config.js
-window.BIZ = {
-  // REQUIRED
-  tier: "starter", // starter | pro | elite
+// config.js
+// Make should overwrite values here per order.
+// Tier rules:
+// - starter: CTA off
+// - pro:     CTA on
+// - elite:   CTA on (single CTA in this template; multiple CTAs can be added later)
 
-  company: "Select Source Water",
-  fullName: "Greg Buckner",
-  title: "Water Consultant",
-  city: "Tracy, CA",
+window.BROCHURE_CONFIG = {
+  tier: "pro", // "starter" | "pro" | "elite"
 
-  // Headline area
-  headline: "Hygia Whole-Home Filtration + Softener",
-  brochureImage: "brochure.png", // file in repo root (or a full URL)
+  brand: {
+    company: "Select Source Water",
+    product: "Hygia Whole-Home Filtration + Softener",
+    watermark: "Installed by Select Source Water"
+  },
 
-  // Badges (up to 4 base)
-  badges: ["Custom Dual-Tank", "RO + Alkaline", "Professional Install", "Lifetime Warranty"],
+  pricing: {
+    label: "Total Price",
+    value: "$7,990",
+    note: "One-time total"
+  },
 
-  // Optional tier badges
-  badgePro: "Pro Upgrade Available",
-  badgeElite: "Elite Priority Setup",
+  // Optional theme override (if you want per-customer color matching)
+  // Remove this block entirely if you want consistent brand styling across all brochures.
+  theme: {
+    bgA: "#04151f",
+    bgB: "#0a2f3f",
+    accent: "#4fe3ff",
+    accent2: "#63ffb2"
+  },
 
-  // Price block
-  priceLabel: "Total Price",
-  priceValue: "$7,990",
-  pricePill: "One-time total",
+  badges: [
+    "Custom Dual-Tank",
+    "RO + Alkaline",
+    "Professional Install",
+    "Lifetime Warranty"
+  ],
 
-  // Features (4 base)
+  brochureImage: "brochure.png",
+
+  contact: {
+    phone: "12097694750",             // digits only recommended
+    website: "https://selectsourcewater.com"
+  },
+
+  cta: {
+    // If omitted, tier rules apply automatically.
+    // You can force-enable/disable per customer by setting enabled true/false.
+    enabled: true,
+    label: "View Brochure"
+  },
+
   features: [
     "Custom Built Dual Tank Whole Home Water Filtration and Softener",
     "Reverse Osmosis Alkaline System",
     "Professional Install",
     "Lifetime Warranty"
-  ],
-
-  // Tier features
-  featurePro: "Pro: Expanded persuasion sections + stronger layout",
-  featureElite: "Elite: Bonus offer + deeper branding polish",
-
-  // Contact
-  phoneTel: "12097694750",
-  email: "test@example.com",
-  website: "selectsourcewater.com",
-  textPrefill: "Hi! I just checked out your brochure. Quick question:",
-
-  // Optional
-  bookingLink: "REPLACE_BOOKING_LINK",
-
-  // Elite CTA (elite only)
-  eliteCtaLabel: "Claim Elite Offer",
-  eliteCtaUrl: "https://selectsourcewater.com",
-
-  // Footer/Watermark
-  footerPill: "Send this link to your referral partner — mobile friendly",
-  watermark: "Installed by Select Source Water"
+  ]
 };
