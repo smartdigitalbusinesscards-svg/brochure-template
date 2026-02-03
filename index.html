@@ -3,440 +3,298 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#04151f" />
   <title>Smart Digital Brochure</title>
 
-  <style>
-    :root{
-      --bgA:#04151f;
-      --bgB:#0a2f3f;
-      --card: rgba(255,255,255,0.085);
-      --card2: rgba(255,255,255,0.055);
-      --border: rgba(255,255,255,0.16);
-      --text:#ecf6ff;
-      --muted: rgba(236,246,255,0.74);
-      --accent:#4fe3ff;
-      --accent2:#63ffb2;
-      --shadow: 0 18px 55px rgba(0,0,0,.48);
-      --radius: 18px;
-    }
+  <!-- Shared styles (global) -->
+  <link rel="stylesheet" href="shared.css" />
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 12% 10%, rgba(79,227,255,.18), transparent 58%),
-        radial-gradient(860px 520px at 88% 35%, rgba(99,255,178,.12), transparent 58%),
-        linear-gradient(160deg, var(--bgA), var(--bgB));
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    /* Water background drift */
-    .water{
-      position:fixed; inset:-70px;
-      background:
-        radial-gradient(1200px 600px at 18% 18%, rgba(79,227,255,.10), transparent 60%),
-        radial-gradient(900px 520px at 82% 62%, rgba(99,255,178,.08), transparent 60%),
-        radial-gradient(700px 420px at 50% 90%, rgba(255,255,255,.055), transparent 60%);
-      filter: blur(18px);
-      animation: drift 12s ease-in-out infinite alternate;
-      pointer-events:none;
-      opacity:.92;
-    }
-    @keyframes drift{
-      from{ transform: translate3d(-12px,-10px,0) scale(1.02); }
-      to  { transform: translate3d(14px,12px,0) scale(1.06); }
-    }
-
-    .wrap{
-      max-width:1120px;
-      margin:0 auto;
-      padding:26px 18px 44px;
-      position:relative;
-      z-index:1;
-    }
-
-    header{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:22px;
-    }
-
-    .brand{ display:flex; flex-direction:column; gap:6px; }
-    .kicker{
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      font-size:12px;
-      color:var(--muted);
-    }
-    h1{
-      margin:0;
-      font-size:28px;
-      line-height:1.1;
-      letter-spacing:-0.02em;
-    }
-
-    .badgeRow{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      justify-content:flex-end;
-    }
-    .badge{
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      backdrop-filter: blur(10px);
-      white-space:nowrap;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:20px;
-    }
-    @media (max-width: 920px){
-      .grid{ grid-template-columns:1fr; }
-      .badgeRow{ justify-content:flex-start; }
-    }
-
-    .card{
-      background: linear-gradient(180deg, var(--card), var(--card2));
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    /* IMAGE CARD */
-    .imgCard{
-      padding:12px;
-      position:relative;
-      overflow:hidden;
-    }
-    .imgBtn{
-      all:unset;
-      display:block;
-      cursor: zoom-in;
-      width:100%;
-    }
-    img{
-      width:100%;
-      height:auto;
-      display:block;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 14px 40px rgba(0,0,0,.35);
-    }
-    .imgHint{
-      margin-top:12px;
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
-      box-shadow:0 0 12px rgba(79,227,255,.55);
-    }
-
-    /* INFO CARD */
-    .infoCard{ padding:22px; }
-
-    .priceRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:12px;
-      margin-bottom:22px;
-    }
-    .priceLabel{
-      font-size:12px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-
-    .priceValue{
-      position:relative;
-      display:inline-block;
-      font-size:36px;
-      font-weight:900;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      overflow:hidden;
-    }
-
-    /* Shine sweep */
-    .priceValue.shine-once::after{
-      content:"";
-      position:absolute;
-      top:-25%;
-      left:-140%;
-      width:70%;
-      height:160%;
-      transform: skewX(-18deg);
-      background: linear-gradient(
-        90deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.55) 45%,
-        rgba(255,255,255,0) 100%
-      );
-      animation: priceShine 900ms ease-out 1;
-    }
-    @keyframes priceShine{
-      from{ left:-140%; }
-      to{ left:140%; }
-    }
-
-    .pill{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.10);
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      display:inline-block;
-    }
-
-    ul{
-      margin:0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:12px;
-    }
-    li{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.12);
-    }
-    .check{
-      width:22px;
-      height:22px;
-      border-radius:8px;
-      background: radial-gradient(circle at 30% 30%, #fff, rgba(79,227,255,.35));
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 0 18px rgba(79,227,255,.22);
-      display:grid;
-      place-items:center;
-      font-size:14px;
-      flex:0 0 auto;
-    }
-    .liText{ font-size:14px; }
-
-    .ctaRow{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:12px;
-      margin-top:22px;
-    }
-
-    /* Buttons + Ripple */
-    .btn{
-      position:relative;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.14);
-      color:var(--text);
-      padding:12px 16px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:800;
-      font-size:14px;
-      transition:transform .12s ease, border-color .12s ease;
-      -webkit-tap-highlight-color: transparent;
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:44px;
-    }
-    .btn:hover{ transform:translateY(-1px); border-color: rgba(255,255,255,.22); }
-    .btn.primary{
-      background: linear-gradient(90deg, rgba(79,227,255,.95), rgba(99,255,178,.85));
-      color:#021018;
-      border:none;
-    }
-    .btn[aria-disabled="true"]{
-      opacity:.45;
-      pointer-events:none;
-    }
-
-    .ripple{
-      position:absolute;
-      border-radius:999px;
-      transform: scale(0);
-      animation: ripple 600ms ease-out forwards;
-      background: rgba(255,255,255,.35);
-      pointer-events:none;
-    }
-    @keyframes ripple{
-      to{ transform: scale(1); opacity:0; }
-    }
-
-    footer{
-      margin-top:20px;
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-
-    .watermark{
-      margin-top:12px;
-      text-align:center;
-      font-size:11px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color: rgba(236,246,255,.35);
-    }
-
-    /* MODAL */
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.75);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      padding:16px;
-    }
-    .modal.open{ display:flex; }
-    .modalInner{
-      background:#060e14;
-      border-radius:16px;
-      max-width:1100px;
-      width:100%;
-      max-height:92vh;
-      overflow:auto;
-      padding:12px;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow: 0 22px 80px rgba(0,0,0,.65);
-    }
-    .modalImg{
-      width:100%;
-      border-radius:12px;
-      cursor:zoom-out;
-      border:1px solid rgba(255,255,255,.10);
-    }
-
-    /* Tier sections default hidden; JS reveals them safely */
-    [data-tier]{ display:none; }
-    #eliteCtaBtnWrap{ display:none; }
-    #bookingBtnWrap{ display:none; }
-  </style>
+  <!-- If JS is blocked, at least show something readable -->
+  <noscript>
+    <style>
+      .jsOnly{ display:none !important; }
+      .noJs{ display:block !important; }
+    </style>
+  </noscript>
 </head>
 
 <body>
-<div class="water"></div>
+  <div class="water" aria-hidden="true"></div>
 
-<div class="wrap">
-  <header>
-    <div class="brand">
-      <div class="kicker" id="kicker">Company Name</div>
-      <h1 id="headline">Brochure Headline</h1>
-      <div class="pill" style="margin-top:8px;" id="sublinePill">Your Name · Title · City</div>
-    </div>
-
-    <div class="badgeRow" id="badgeRow">
-      <div class="badge" id="badge1">Badge 1</div>
-      <div class="badge" id="badge2">Badge 2</div>
-      <div class="badge" id="badge3">Badge 3</div>
-      <div class="badge" id="badge4">Badge 4</div>
-      <div class="badge" id="badgePro" data-tier="pro">Pro Badge</div>
-      <div class="badge" id="badgeElite" data-tier="elite">Elite Badge</div>
-    </div>
-  </header>
-
-  <div class="grid">
-    <!-- BROCHURE IMAGE -->
-    <section class="card imgCard">
-      <button class="imgBtn" id="openModal">
-        <img id="brochureImg" src="brochure.png" alt="Digital Brochure">
-      </button>
-      <div class="imgHint">
-        <span class="dot"></span> Tap the brochure to zoom in.
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="kicker" id="kicker">Company</div>
+        <h1 id="titleH1">Offer Title</h1>
       </div>
-    </section>
 
-    <!-- DETAILS -->
-    <section class="card infoCard">
-      <div class="priceRow">
-        <div>
-          <div class="priceLabel" id="priceLabel">Total Price</div>
-          <div class="priceValue" id="priceValue">$0</div>
+      <div class="badgeRow" id="badgeRow" aria-label="Highlights"></div>
+    </header>
+
+    <div class="grid">
+      <!-- BROCHURE IMAGE CARD -->
+      <section class="card imgCard">
+        <button class="imgBtn jsOnly" id="openModal" type="button" aria-label="Open brochure image">
+          <img id="brochureImg" src="brochure.png" alt="Brochure" />
+        </button>
+
+        <!-- Fallback for no-js -->
+        <div class="noJs" style="display:none;">
+          <img id="brochureImgNoJs" src="brochure.png" alt="Brochure" />
         </div>
-        <div class="pill" id="pricePill">One-time total</div>
-      </div>
 
-      <ul id="featureList">
-        <li><span class="check">✓</span><span class="liText" id="feat1">Feature 1</span></li>
-        <li><span class="check">✓</span><span class="liText" id="feat2">Feature 2</span></li>
-        <li><span class="check">✓</span><span class="liText" id="feat3">Feature 3</span></li>
-        <li><span class="check">✓</span><span class="liText" id="feat4">Feature 4</span></li>
+        <div class="imgHint">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="imgHintText">Tap the brochure to zoom in.</span>
+        </div>
+      </section>
 
-        <li data-tier="pro"><span class="check">✓</span><span class="liText" id="featPro">Pro Feature</span></li>
-        <li data-tier="elite"><span class="check">✓</span><span class="liText" id="featElite">Elite Feature</span></li>
-      </ul>
+      <!-- DETAILS CARD -->
+      <section class="card infoCard">
+        <div class="priceRow">
+          <div>
+            <div class="priceLabel" id="priceLabel">Total Price</div>
+            <div class="priceValue" id="priceValue">$0</div>
+          </div>
+          <div class="pill" id="priceNote">One-time total</div>
+        </div>
 
-      <div class="ctaRow">
-        <a class="btn primary" href="#" id="viewBrochureBtn">View Brochure</a>
+        <ul id="featureList" aria-label="Included features"></ul>
 
-        <a class="btn" href="#" id="textBtn" aria-disabled="true">Text</a>
-        <a class="btn" href="#" id="callBtn" aria-disabled="true">Call</a>
-        <a class="btn" href="#" id="websiteBtn" aria-disabled="true" target="_blank" rel="noopener">Website</a>
+        <div class="ctaRow" id="ctaRow">
+          <!-- CTA (optional by tier) -->
+          <a class="btn primary jsOnly" href="#" id="viewBtn">View Brochure</a>
 
-        <span id="bookingBtnWrap">
-          <a class="btn" href="#" id="bookBtn" aria-disabled="true">Book</a>
-        </span>
+          <!-- Contact buttons -->
+          <a class="btn jsOnly" href="#" id="textBtn">Text</a>
+          <a class="btn jsOnly" href="#" id="callBtn">Call</a>
+          <a class="btn jsOnly" href="#" id="webBtn" target="_blank" rel="noopener">Website</a>
 
-        <span id="eliteCtaBtnWrap">
-          <a class="btn primary" href="#" id="eliteCtaBtn" aria-disabled="true">Elite Offer</a>
-        </span>
-      </div>
-    </section>
+          <!-- No-JS fallback -->
+          <div class="noJs" style="display:none;">
+            <a class="btn primary" href="brochure.png" target="_blank" rel="noopener">View Brochure</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="pill" id="footerPill">Send this link to your referral partner — mobile friendly</div>
+      <div id="footerRight">© <span id="year"></span> Company</div>
+    </footer>
+
+    <div class="watermark" id="watermark">Installed by Company</div>
   </div>
 
-  <footer>
-    <div class="pill" id="footerPill">Send this link to your referral partner — mobile friendly</div>
-    <div id="tierBadge">Starter</div>
-  </footer>
-
-  <div class="watermark" id="watermarkText">Installed by Company Name</div>
-</div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modalInner">
-    <img class="modalImg" id="modalImg" src="brochure.png" alt="Brochure Zoom">
+  <!-- MODAL -->
+  <div class="modal jsOnly" id="modal" role="dialog" aria-modal="true" aria-label="Brochure preview">
+    <div class="modalInner">
+      <img class="modalImg" src="brochure.png" id="modalImg" alt="Brochure enlarged view" />
+      <button class="modalClose" type="button" id="modalClose" aria-label="Close brochure preview">✕</button>
+    </div>
   </div>
-</div>
 
-<script src="shared/config.js?v=1"></script>
-<script src="shared/shared.js?v=1"></script>
+  <!-- Config (Make edits this file per customer) -->
+  <script src="config.js"></script>
+
+  <!-- Page logic -->
+  <script>
+    (function () {
+      const cfg = (window.BROCHURE_CONFIG || {});
+      const safeStr = (v, fallback="") => (typeof v === "string" && v.trim()) ? v.trim() : fallback;
+
+      // ---- tier normalize
+      const tier = safeStr(cfg.tier, "starter").toLowerCase();
+      const TIER = (tier === "pro" || tier === "elite") ? tier : "starter";
+
+      // ---- brand
+      const company  = safeStr(cfg.brand?.company, "Select Source Water");
+      const product  = safeStr(cfg.brand?.product, "Hygia Whole-Home Filtration + Softener");
+      const watermark = safeStr(cfg.brand?.watermark, `Installed by ${company}`);
+
+      // ---- pricing
+      const priceLabel = safeStr(cfg.pricing?.label, "Total Price");
+      const priceValue = safeStr(cfg.pricing?.value, "$0");
+      const priceNote  = safeStr(cfg.pricing?.note, "One-time total");
+
+      // ---- images + CTA label
+      const brochureImage = safeStr(cfg.brochureImage, "brochure.png");
+      const ctaLabel = safeStr(cfg.cta?.label, "View Brochure");
+
+      // ---- contact
+      const rawPhone = safeStr(cfg.contact?.phone, "");
+      const website  = safeStr(cfg.contact?.website, "");
+
+      // phone sanitizer: keep digits only, assume US if 10 digits
+      const digits = rawPhone.replace(/\D/g, "");
+      const phoneForLinks = digits.length === 10 ? ("1" + digits) : digits; // e.g. 1209...
+      const telHref = phoneForLinks ? ("tel:+" + phoneForLinks) : null;
+      const smsHref = phoneForLinks ? ("sms:+" + phoneForLinks) : null;
+
+      // ---- badges + features
+      const badges = Array.isArray(cfg.badges) ? cfg.badges : [];
+      const features = Array.isArray(cfg.features) ? cfg.features : [];
+
+      // ---- text injections
+      const el = (id) => document.getElementById(id);
+
+      el("kicker").textContent = company;
+      el("titleH1").textContent = product;
+
+      document.title = `${company} | ${product}`;
+
+      el("priceLabel").textContent = priceLabel;
+      el("priceValue").textContent = priceValue;
+      el("priceNote").textContent  = priceNote;
+
+      el("footerRight").innerHTML = `© <span id="year"></span> ${company}`;
+      el("year").textContent = String(new Date().getFullYear());
+
+      el("watermark").textContent = watermark;
+
+      // brochure images
+      el("brochureImg").src = brochureImage;
+      el("brochureImg").alt = `${company} brochure`;
+      const noJsImg = el("brochureImgNoJs");
+      if (noJsImg) {
+        noJsImg.src = brochureImage;
+        noJsImg.alt = `${company} brochure`;
+      }
+      el("modalImg").src = brochureImage;
+      el("modalImg").alt = `${company} brochure enlarged`;
+
+      // badges
+      const badgeRow = el("badgeRow");
+      badgeRow.innerHTML = "";
+      badges.forEach(b => {
+        const txt = safeStr(b, "");
+        if (!txt) return;
+        const div = document.createElement("div");
+        div.className = "badge";
+        div.textContent = txt;
+        badgeRow.appendChild(div);
+      });
+
+      // features list
+      const list = el("featureList");
+      list.innerHTML = "";
+      features.forEach(f => {
+        const txt = safeStr(f, "");
+        if (!txt) return;
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
+        li.querySelector(".liText").textContent = txt;
+        list.appendChild(li);
+      });
+
+      // CTA rules:
+      // - Starter: NO CTA button
+      // - Pro: CTA ON (single)
+      // - Elite: CTA ON (still single here; your Elite "multiple CTAs" can be a later add-on)
+      const ctaEnabledByTier = (TIER === "pro" || TIER === "elite");
+      const ctaFlag = (cfg.cta && typeof cfg.cta.enabled === "boolean") ? cfg.cta.enabled : ctaEnabledByTier;
+      const showCTA = Boolean(ctaFlag) && ctaEnabledByTier;
+
+      const viewBtn = el("viewBtn");
+      viewBtn.textContent = ctaLabel;
+      // view button just opens modal
+      if (!showCTA) {
+        viewBtn.style.display = "none";
+      }
+
+      // Contact buttons
+      const textBtn = el("textBtn");
+      const callBtn = el("callBtn");
+      const webBtn  = el("webBtn");
+
+      // If missing phone/website, disable those buttons visually + functionally
+      function disableBtn(a){
+        a.setAttribute("aria-disabled","true");
+        a.style.opacity = "0.45";
+        a.style.pointerEvents = "none";
+        a.removeAttribute("href");
+      }
+
+      if (smsHref) textBtn.href = smsHref; else disableBtn(textBtn);
+      if (telHref) callBtn.href = telHref; else disableBtn(callBtn);
+      if (website) webBtn.href = website; else disableBtn(webBtn);
+
+      // ---- Modal open/close
+      const modal = el("modal");
+      const openModalBtn = el("openModal");
+      const modalClose = el("modalClose");
+
+      function openModal(){
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeModal(){
+        modal.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      // open from image
+      openModalBtn.addEventListener("click", openModal);
+
+      // open from CTA (if visible)
+      viewBtn.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
+
+      // close behaviors
+      modal.addEventListener("click", (e) => {
+        // close if you click the dark overlay (not the inner)
+        if (e.target === modal) closeModal();
+      });
+      modalClose.addEventListener("click", closeModal);
+
+      // ESC closes
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+      });
+
+      // ---- Price shine once
+      const priceEl = el("priceValue");
+      window.addEventListener("load", () => {
+        priceEl.classList.add("shine-once");
+        setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
+      });
+
+      // ---- Ripple effect (buttons only)
+      function addRipple(e){
+        const btn = e.currentTarget;
+        if (!btn || btn.getAttribute("aria-disabled") === "true") return;
+
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 2;
+
+        const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+        const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+
+        const x = clientX - rect.left - size/2;
+        const y = clientY - rect.top - size/2;
+
+        const ripple = document.createElement("span");
+        ripple.className = "ripple";
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = x + "px";
+        ripple.style.top = y + "px";
+        btn.appendChild(ripple);
+        ripple.addEventListener("animationend", ()=>ripple.remove(), {once:true});
+      }
+
+      document.querySelectorAll(".btn").forEach(btn=>{
+        btn.addEventListener("click", addRipple);
+        btn.addEventListener("touchstart", addRipple, {passive:true});
+      });
+
+      // ---- Optional: apply accent colors per config (if provided)
+      // cfg.theme = { accent: "#4fe3ff", accent2:"#63ffb2", bgA:"#04151f", bgB:"#0a2f3f" }
+      if (cfg.theme) {
+        const root = document.documentElement.style;
+        if (cfg.theme.accent)  root.setProperty("--accent",  cfg.theme.accent);
+        if (cfg.theme.accent2) root.setProperty("--accent2", cfg.theme.accent2);
+        if (cfg.theme.bgA)     root.setProperty("--bgA",     cfg.theme.bgA);
+        if (cfg.theme.bgB)     root.setProperty("--bgB",     cfg.theme.bgB);
+      }
+    })();
+  </script>
 </body>
 </html>
