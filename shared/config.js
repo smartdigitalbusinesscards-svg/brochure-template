@@ -21,9 +21,9 @@ window.BROCHURE_CONFIG = {
   },
 
   pricing: {
-    label: "Total Price",
-    value: "$7,990",
-    note: "One-time total"
+    label: "Pricing",
+    value: "Your Price Here",
+    note: "Based on Your Home & Setup"
   },
 
   // Optional theme override (leave as-is for your main brand look)
