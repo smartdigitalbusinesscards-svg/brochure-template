@@ -1,9 +1,4 @@
-// config.js
-// Make should overwrite values here per order.
-// Tier rules:
-// - starter: CTA off
-// - pro:     CTA on
-// - elite:   CTA on (single CTA in this template; multiple CTAs can be added later)
+// shared/config.js
 
 window.BROCHURE_CONFIG = {
   tier: "pro", // "starter" | "pro" | "elite"
@@ -20,8 +15,6 @@ window.BROCHURE_CONFIG = {
     note: "One-time total"
   },
 
-  // Optional theme override (if you want per-customer color matching)
-  // Remove this block entirely if you want consistent brand styling across all brochures.
   theme: {
     bgA: "#04151f",
     bgB: "#0a2f3f",
@@ -39,13 +32,11 @@ window.BROCHURE_CONFIG = {
   brochureImage: "brochure.png",
 
   contact: {
-    phone: "12097694750",             // digits only recommended
+    phone: "12097694750",
     website: "https://selectsourcewater.com"
   },
 
   cta: {
-    // If omitted, tier rules apply automatically.
-    // You can force-enable/disable per customer by setting enabled true/false.
     enabled: true,
     label: "View Brochure"
   },
