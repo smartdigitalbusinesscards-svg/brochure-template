@@ -1,351 +1,187 @@
-:root{
-  --bgA:#04151f;
-  --bgB:#0a2f3f;
-  --card: rgba(255,255,255,0.085);
-  --card2: rgba(255,255,255,0.055);
-  --border: rgba(255,255,255,0.16);
-  --text:#ecf6ff;
-  --muted: rgba(236,246,255,0.74);
-  --accent:#4fe3ff;
-  --accent2:#63ffb2;
-  --shadow: 0 18px 55px rgba(0,0,0,.48);
-  --radius: 18px;
-}
+(function () {
+  const cfg = (window.BROCHURE_CONFIG || {});
+  const safeStr = (v, fallback="") => (typeof v === "string" && v.trim()) ? v.trim() : fallback;
 
-*{ box-sizing:border-box; }
-html, body { height:100%; }
+  // ---- tier normalize
+  const tier = safeStr(cfg.tier, "starter").toLowerCase();
+  const TIER = (tier === "pro" || tier === "elite") ? tier : "starter";
 
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(900px 520px at 12% 10%, rgba(79,227,255,.18), transparent 58%),
-    radial-gradient(860px 520px at 88% 35%, rgba(99,255,178,.12), transparent 58%),
-    linear-gradient(160deg, var(--bgA), var(--bgB));
-  min-height:100vh;
-  overflow-x:hidden;
-}
+  // ---- brand
+  const company  = safeStr(cfg.brand?.company, "Select Source Water");
+  const product  = safeStr(cfg.brand?.product, "Hygia Whole-Home Filtration + Softener");
+  const watermark = safeStr(cfg.brand?.watermark, `Installed by ${company}`);
 
-/* Water background drift */
-.water{
-  position:fixed; inset:-70px;
-  background:
-    radial-gradient(1200px 600px at 18% 18%, rgba(79,227,255,.10), transparent 60%),
-    radial-gradient(900px 520px at 82% 62%, rgba(99,255,178,.08), transparent 60%),
-    radial-gradient(700px 420px at 50% 90%, rgba(255,255,255,.055), transparent 60%);
-  filter: blur(18px);
-  animation: drift 12s ease-in-out infinite alternate;
-  pointer-events:none;
-  opacity:.92;
-}
-@keyframes drift{
-  from{ transform: translate3d(-12px,-10px,0) scale(1.02); }
-  to  { transform: translate3d(14px,12px,0) scale(1.06); }
-}
+  // ---- pricing
+  const priceLabel = safeStr(cfg.pricing?.label, "Total Price");
+  const priceValue = safeStr(cfg.pricing?.value, "$0");
+  const priceNote  = safeStr(cfg.pricing?.note, "One-time total");
 
-.wrap{
-  max-width:1120px;
-  margin:0 auto;
-  padding:26px 18px 44px;
-  position:relative;
-  z-index:1;
-}
+  // ---- images + CTA label
+  const brochureImage = safeStr(cfg.brochureImage, "brochure.png");
+  const ctaLabel = safeStr(cfg.cta?.label, "View Brochure");
 
-header{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:14px;
-  margin-bottom:22px;
-}
+  // ---- contact
+  const rawPhone = safeStr(cfg.contact?.phone, "");
+  const website  = safeStr(cfg.contact?.website, "");
 
-.brand{ display:flex; flex-direction:column; gap:6px; }
-.kicker{
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  font-size:12px;
-  color:var(--muted);
-}
-h1{
-  margin:0;
-  font-size:28px;
-  line-height:1.1;
-  letter-spacing:-0.02em;
-}
+  // phone sanitizer: keep digits only, assume US if 10 digits
+  const digits = rawPhone.replace(/\D/g, "");
+  const phoneForLinks = digits.length === 10 ? ("1" + digits) : digits; // e.g. 1209...
+  const telHref = phoneForLinks ? ("tel:+" + phoneForLinks) : null;
+  const smsHref = phoneForLinks ? ("sms:+" + phoneForLinks) : null;
 
-.badgeRow{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:flex-end;
-}
-.badge{
-  border:1px solid var(--border);
-  background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:12px;
-  color:var(--muted);
-  backdrop-filter: blur(10px);
-  white-space:nowrap;
-}
+  // ---- badges + features
+  const badges = Array.isArray(cfg.badges) ? cfg.badges : [];
+  const features = Array.isArray(cfg.features) ? cfg.features : [];
 
-.grid{
-  display:grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap:20px;
-}
-@media (max-width: 920px){
-  .grid{ grid-template-columns:1fr; }
-  .badgeRow{ justify-content:flex-start; }
-}
+  // ---- helpers
+  const el = (id) => document.getElementById(id);
 
-.card{
-  background: linear-gradient(180deg, var(--card), var(--card2));
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
-}
+  // ---- text injections
+  el("kicker").textContent = company;
+  el("titleH1").textContent = product;
 
-/* IMAGE CARD */
-.imgCard{
-  padding:12px;
-  position:relative;
-  overflow:hidden;
-}
-.imgBtn{
-  all:unset;
-  display:block;
-  cursor: zoom-in;
-}
-img{
-  width:100%;
-  height:auto;
-  display:block;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 14px 40px rgba(0,0,0,.35);
-}
-.imgHint{
-  margin-top:12px;
-  color:var(--muted);
-  font-size:12px;
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:999px;
-  background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
-  box-shadow:0 0 12px rgba(79,227,255,.55);
-}
+  document.title = `${company} | ${product}`;
 
-/* INFO CARD */
-.infoCard{ padding:22px; }
+  el("priceLabel").textContent = priceLabel;
+  el("priceValue").textContent = priceValue;
+  el("priceNote").textContent  = priceNote;
 
-.priceRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:12px;
-  margin-bottom:22px;
-}
-.priceLabel{
-  font-size:12px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-.priceValue{
-  position:relative;
-  display:inline-block;
-  font-size:36px;
-  font-weight:900;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  overflow:hidden;
-}
+  el("footerRight").innerHTML = `© <span id="year"></span> ${company}`;
+  el("year").textContent = String(new Date().getFullYear());
 
-/* Shine sweep */
-.priceValue.shine-once::after{
-  content:"";
-  position:absolute;
-  top:-25%;
-  left:-140%;
-  width:70%;
-  height:160%;
-  transform: skewX(-18deg);
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.55) 45%,
-    rgba(255,255,255,0) 100%
-  );
-  animation: priceShine 900ms ease-out 1;
-}
-@keyframes priceShine{
-  from{ left:-140%; }
-  to{ left:140%; }
-}
+  el("watermark").textContent = watermark;
 
-.pill{
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.10);
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:12px;
-  color:var(--muted);
-}
+  // brochure images
+  el("brochureImg").src = brochureImage;
+  el("brochureImg").alt = `${company} brochure`;
+  const noJsImg = el("brochureImgNoJs");
+  if (noJsImg) {
+    noJsImg.src = brochureImage;
+    noJsImg.alt = `${company} brochure`;
+  }
+  el("modalImg").src = brochureImage;
+  el("modalImg").alt = `${company} brochure enlarged`;
 
-ul{
-  margin:0;
-  padding:0;
-  list-style:none;
-  display:grid;
-  gap:12px;
-}
-li{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  padding:14px 14px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.12);
-}
-.check{
-  width:22px;
-  height:22px;
-  border-radius:8px;
-  background: radial-gradient(circle at 30% 30%, #fff, rgba(79,227,255,.35));
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 0 18px rgba(79,227,255,.22);
-  display:grid;
-  place-items:center;
-  font-size:14px;
-  flex:0 0 auto;
-}
-.liText{ font-size:14px; }
+  // badges
+  const badgeRow = el("badgeRow");
+  badgeRow.innerHTML = "";
+  badges.forEach(b => {
+    const txt = safeStr(b, "");
+    if (!txt) return;
+    const div = document.createElement("div");
+    div.className = "badge";
+    div.textContent = txt;
+    badgeRow.appendChild(div);
+  });
 
-.ctaRow{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:12px;
-  margin-top:22px;
-}
+  // features list
+  const list = el("featureList");
+  list.innerHTML = "";
+  features.forEach(f => {
+    const txt = safeStr(f, "");
+    if (!txt) return;
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
+    li.querySelector(".liText").textContent = txt;
+    list.appendChild(li);
+  });
 
-/* Buttons + Ripple */
-.btn{
-  position:relative;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.14);
-  color:var(--text);
-  padding:12px 16px;
-  border-radius:14px;
-  text-decoration:none;
-  font-weight:800;
-  font-size:14px;
-  transition:transform .12s ease, border-color .12s ease;
-  -webkit-tap-highlight-color: transparent;
-  user-select:none;
-}
-.btn:hover{ transform:translateY(-1px); border-color: rgba(255,255,255,.22); }
-.btn.primary{
-  background: linear-gradient(90deg, rgba(79,227,255,.95), rgba(99,255,178,.85));
-  color:#021018;
-  border:none;
-}
+  // ✅ CTA rules (your “assurance”):
+  // - Starter: NO “View Brochure” CTA button
+  // - Pro: YES (View Brochure + Text/Call/Website)
+  // - Elite: YES (View Brochure + Text/Call/Website)
+  const ctaEnabledByTier = (TIER === "pro" || TIER === "elite");
+  const ctaFlag = (cfg.cta && typeof cfg.cta.enabled === "boolean") ? cfg.cta.enabled : ctaEnabledByTier;
+  const showCTA = Boolean(ctaFlag) && ctaEnabledByTier;
 
-.ripple{
-  position:absolute;
-  border-radius:999px;
-  transform: scale(0);
-  animation: ripple 600ms ease-out forwards;
-  background: rgba(255,255,255,.35);
-  pointer-events:none;
-}
-@keyframes ripple{
-  to{ transform: scale(1); opacity:0; }
-}
+  const viewBtn = el("viewBtn");
+  viewBtn.textContent = ctaLabel;
+  if (!showCTA) viewBtn.style.display = "none";
 
-footer{
-  margin-top:20px;
-  color:var(--muted);
-  font-size:12px;
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-}
+  // Contact buttons (always exist; disabled if missing)
+  const textBtn = el("textBtn");
+  const callBtn = el("callBtn");
+  const webBtn  = el("webBtn");
 
-.watermark{
-  margin-top:12px;
-  text-align:center;
-  font-size:11px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color: rgba(236,246,255,.35);
-}
+  function disableBtn(a){
+    a.setAttribute("aria-disabled","true");
+    a.style.opacity = "0.45";
+    a.style.pointerEvents = "none";
+    a.removeAttribute("href");
+  }
 
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  padding:16px;
-}
-.modal.open{ display:flex; }
+  if (smsHref) textBtn.href = smsHref; else disableBtn(textBtn);
+  if (telHref) callBtn.href = telHref; else disableBtn(callBtn);
+  if (website) webBtn.href = website; else disableBtn(webBtn);
 
-.modalInner{
-  position:relative;
-  background:#060e14;
-  border-radius:16px;
-  max-width:1100px;
-  width:100%;
-  max-height:92vh;
-  overflow:auto;
-  padding:12px;
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow: 0 22px 80px rgba(0,0,0,.65);
-}
-.modalImg{
-  width:100%;
-  border-radius:12px;
-  cursor:zoom-out;
-  border:1px solid rgba(255,255,255,.10);
-}
+  // ---- Modal open/close
+  const modal = el("modal");
+  const openModalBtn = el("openModal");
+  const modalClose = el("modalClose");
 
-.modalClose{
-  position:absolute;
-  top:10px;
-  right:10px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.35);
-  color: rgba(236,246,255,.88);
-  width:38px;
-  height:38px;
-  border-radius: 12px;
-  cursor:pointer;
-  font-size:16px;
-  font-weight:900;
-}
-.modalClose:hover{ filter: brightness(1.06); transform: translateY(-1px); }
-.modalClose:active{ transform: scale(.98); }
+  function openModal(){
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(){
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
 
-@media (prefers-reduced-motion: reduce){
-  .water{ animation:none; }
-  .btn{ transition:none; }
-}
+  openModalBtn.addEventListener("click", openModal);
+  viewBtn.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  modalClose.addEventListener("click", closeModal);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+  });
+
+  // ---- Price shine once
+  const priceEl = el("priceValue");
+  window.addEventListener("load", () => {
+    priceEl.classList.add("shine-once");
+    setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
+  });
+
+  // ---- Ripple effect (buttons only)
+  function addRipple(e){
+    const btn = e.currentTarget;
+    if (!btn || btn.getAttribute("aria-disabled") === "true") return;
+
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+
+    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+
+    const x = clientX - rect.left - size/2;
+    const y = clientY - rect.top - size/2;
+
+    const ripple = document.createElement("span");
+    ripple.className = "ripple";
+    ripple.style.width = ripple.style.height = size + "px";
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    btn.appendChild(ripple);
+    ripple.addEventListener("animationend", ()=>ripple.remove(), {once:true});
+  }
+
+  document.querySelectorAll(".btn").forEach(btn=>{
+    btn.addEventListener("click", addRipple);
+    btn.addEventListener("touchstart", addRipple, {passive:true});
+  });
+
+  // ---- Optional: apply accent colors per config
+  if (cfg.theme) {
+    const root = document.documentElement.style;
+    if (cfg.theme.accent)  root.setProperty("--accent",  cfg.theme.accent);
+    if (cfg.theme.accent2) root.setProperty("--accent2", cfg.theme.accent2);
+    if (cfg.theme.bgA)     root.setProperty("--bgA",     cfg.theme.bgA);
+    if (cfg.theme.bgB)     root.setProperty("--bgB",     cfg.theme.bgB);
+  }
+})();
