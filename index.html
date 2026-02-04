@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Smart Digital Brochure</title>
 
-  <!-- ✅ CSS is inside /shared/ -->
+  <!-- CSS is inside /shared/ -->
   <link rel="stylesheet" href="./shared/shared.css" />
 
   <noscript>
@@ -30,21 +30,23 @@
     </header>
 
     <div class="grid">
+      <!-- PRODUCT IMAGE CARD -->
       <section class="card imgCard">
-        <button class="imgBtn jsOnly" id="openModal" type="button" aria-label="Open brochure image">
-          <img id="brochureImg" src="brochure.png" alt="Brochure" />
+        <button class="imgBtn jsOnly" id="openModal" type="button" aria-label="Zoom product image">
+          <img id="productImg" src="product.png" alt="Product image" />
         </button>
 
         <div class="noJs" style="display:none;">
-          <img id="brochureImgNoJs" src="brochure.png" alt="Brochure" />
+          <img id="productImgNoJs" src="product.png" alt="Product image" />
         </div>
 
         <div class="imgHint">
           <span class="dot" aria-hidden="true"></span>
-          <span id="imgHintText">Tap the brochure to zoom in.</span>
+          <span id="imgHintText">Tap the product image to zoom in.</span>
         </div>
       </section>
 
+      <!-- DETAILS CARD -->
       <section class="card infoCard">
         <div class="priceRow">
           <div>
@@ -56,15 +58,33 @@
 
         <ul id="featureList" aria-label="Included features"></ul>
 
-        <div class="ctaRow" id="ctaRow">
-          <a class="btn primary jsOnly" href="#" id="viewBtn">View Brochure</a>
-          <a class="btn jsOnly" href="#" id="textBtn">Text</a>
-          <a class="btn jsOnly" href="#" id="callBtn">Call</a>
-          <a class="btn jsOnly" href="#" id="webBtn" target="_blank" rel="noopener">Website</a>
+        <!-- CTA ROW (tier-controlled) -->
+        <div class="ctaRow jsOnly" id="ctaRow" aria-label="Action buttons">
+          <!-- Elite primary CTA -->
+          <a class="btn primary" href="#" id="primaryBtn">Request Info</a>
 
-          <div class="noJs" style="display:none;">
-            <a class="btn primary" href="brochure.png" target="_blank" rel="noopener">View Brochure</a>
-          </div>
+          <!-- Pro/Elite basics -->
+          <a class="btn" href="#" id="textBtn">Text</a>
+          <a class="btn" href="#" id="callBtn">Call</a>
+          <a class="btn" href="#" id="emailBtn">Email</a>
+          <a class="btn" href="#" id="webBtn" target="_blank" rel="noopener">Website</a>
+        </div>
+
+        <!-- No-JS fallback (shows just the website if provided in config.js) -->
+        <div class="noJs" style="display:none; margin-top:14px;">
+          <a class="btn" href="#" id="webBtnNoJs" target="_blank" rel="noopener">Website</a>
+        </div>
+
+        <!-- ELITE ONLY: Social proof -->
+        <div class="jsOnly" id="socialProofWrap" style="display:none; margin-top:18px;">
+          <div class="pill" style="display:inline-block; margin-bottom:10px;">Social Proof</div>
+          <ul id="testimonialList" aria-label="Testimonials"></ul>
+        </div>
+
+        <!-- ELITE ONLY: Embedded content -->
+        <div class="jsOnly" id="embedWrap" style="display:none; margin-top:18px;">
+          <div class="pill" style="display:inline-block; margin-bottom:10px;">Advanced Embedded Content</div>
+          <div id="embedList"></div>
         </div>
       </section>
     </div>
@@ -77,17 +97,17 @@
     <div class="watermark" id="watermark">Installed by Company</div>
   </div>
 
-  <div class="modal jsOnly" id="modal" role="dialog" aria-modal="true" aria-label="Brochure preview">
+  <!-- MODAL (zoom product image) -->
+  <div class="modal jsOnly" id="modal" role="dialog" aria-modal="true" aria-label="Product image preview">
     <div class="modalInner">
-      <img class="modalImg" src="brochure.png" id="modalImg" alt="Brochure enlarged view" />
-      <button class="modalClose" type="button" id="modalClose" aria-label="Close brochure preview">✕</button>
+      <img class="modalImg" src="product.png" id="modalImg" alt="Product enlarged view" />
+      <button class="modalClose" type="button" id="modalClose" aria-label="Close preview">✕</button>
     </div>
   </div>
 
-  <!-- ✅ Config first -->
+  <!-- Config first -->
   <script src="./shared/config.js"></script>
-
-  <!-- ✅ Then shared logic -->
+  <!-- Then shared logic -->
   <script src="./shared/shared.js"></script>
 </body>
 </html>
