@@ -1,77 +1,63 @@
+// shared/shared.js
 (function () {
-  const cfg = (window.BROCHURE_CONFIG || {});
-  const safeStr = (v, fallback = "") => (typeof v === "string" && v.trim()) ? v.trim() : fallback;
+  const cfg = window.BROCHURE_CONFIG || {};
 
-  // ---- tier normalize
-  const tierRaw = safeStr(cfg.tier, "starter").toLowerCase();
+  const safeStr = (v, fallback = "") =>
+    typeof v === "string" && v.trim() ? v.trim() : fallback;
+
+  const getParam = (key) => {
+    try {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(key);
+    } catch {
+      return null;
+    }
+  };
+
+  // Tier: allow ?tier=starter|pro|elite override for testing
+  const tierFromCfg = safeStr(cfg.tier, "starter").toLowerCase();
+  const tierFromUrl = safeStr(getParam("tier"), "").toLowerCase();
+  const tierRaw = (tierFromUrl || tierFromCfg);
   const TIER = (tierRaw === "pro" || tierRaw === "elite") ? tierRaw : "starter";
 
-  // ---- helpers
   const el = (id) => document.getElementById(id);
-  const isHttps = (url) => /^https:\/\//i.test(url || "");
-  const digitsOnly = (s) => (s || "").replace(/\D/g, "");
 
-  function disableBtn(a) {
-    if (!a) return;
-    a.setAttribute("aria-disabled", "true");
-    a.style.opacity = "0.45";
-    a.style.pointerEvents = "none";
-    a.removeAttribute("href");
-  }
-
-  function showBtn(a) {
-    if (!a) return;
-    a.style.display = "";
-    a.removeAttribute("aria-disabled");
-    a.style.opacity = "";
-    a.style.pointerEvents = "";
-  }
-
-  // ---- brand
-  const company   = safeStr(cfg.brand?.company, "Company");
-  const product   = safeStr(cfg.brand?.product, "Offer Title");
+  // ---- Brand
+  const company = safeStr(cfg.brand?.company, "Company");
+  const product = safeStr(cfg.brand?.product, "Offer Title");
   const watermark = safeStr(cfg.brand?.watermark, `Installed by ${company}`);
 
-  el("kicker").textContent = company;
-  el("titleH1").textContent = product;
-  el("watermark").textContent = watermark;
+  // ---- Pricing
+  const priceLabel = safeStr(cfg.pricing?.label, "Total Price");
+  const priceValue = safeStr(cfg.pricing?.value, "$0");
+  const priceNote  = safeStr(cfg.pricing?.note, "One-time total");
 
-  document.title = `${company} | ${product}`;
+  // ---- Images (you renamed to product.png)
+  const productImage = safeStr(cfg.productImage, safeStr(cfg.brochureImage, "product.png"));
 
-  // ---- pricing
-  el("priceLabel").textContent = safeStr(cfg.pricing?.label, "Total Price");
-  el("priceValue").textContent = safeStr(cfg.pricing?.value, "$0");
-  el("priceNote").textContent  = safeStr(cfg.pricing?.note, "One-time total");
+  // ---- Contact + Elite Extras
+  const rawPhone = safeStr(cfg.contact?.phone, "");
+  const email    = safeStr(cfg.contact?.email, "");
+  const website  = safeStr(cfg.contact?.website, "");
 
-  // footer
-  el("footerRight").innerHTML = `© <span id="year"></span> ${company}`;
-  el("year").textContent = String(new Date().getFullYear());
+  // Elite-only CTA URL (intake form / request info)
+  const requestInfoUrl =
+    safeStr(cfg.elite?.requestInfoUrl, safeStr(cfg.contact?.requestInfoUrl, ""));
 
-  // ---- badges
-  const badgeRow = el("badgeRow");
-  badgeRow.innerHTML = "";
-  (Array.isArray(cfg.badges) ? cfg.badges : []).forEach(b => {
-    const txt = safeStr(b, "");
-    if (!txt) return;
-    const div = document.createElement("div");
-    div.className = "badge";
-    div.textContent = txt;
-    badgeRow.appendChild(div);
-  });
+  // Elite-only social proof
+  const socialProof = Array.isArray(cfg.elite?.socialProof) ? cfg.elite.socialProof : [];
 
-  // ---- features list
-  const list = el("featureList");
-  list.innerHTML = "";
-  (Array.isArray(cfg.features) ? cfg.features : []).forEach(f => {
-    const txt = safeStr(f, "");
-    if (!txt) return;
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
-    li.querySelector(".liText").textContent = txt;
-    list.appendChild(li);
-  });
+  // Elite-only embedded content
+  // Option A: embedHtml (full HTML string)
+  // Option B: embedUrl (iframe URL)
+  const embedHtml = safeStr(cfg.elite?.embedHtml, "");
+  const embedUrl  = safeStr(cfg.elite?.embedUrl, "");
 
-  // ---- theme overrides (optional)
+  // ---- Badges + Features
+  const badges = Array.isArray(cfg.badges) ? cfg.badges : [];
+  const features = Array.isArray(cfg.features) ? cfg.features : [];
+
+  // ---- Apply theme vars (optional)
   if (cfg.theme) {
     const root = document.documentElement.style;
     if (cfg.theme.accent)  root.setProperty("--accent",  cfg.theme.accent);
@@ -80,26 +66,179 @@
     if (cfg.theme.bgB)     root.setProperty("--bgB",     cfg.theme.bgB);
   }
 
-  // ---- product image
-  const productImage = safeStr(cfg.productImage, "product.png");
-  const productImg = el("productImg");
-  const productImgNoJs = el("productImgNoJs");
-  const modalImg = el("modalImg");
+  // ---- Inject text
+  el("kicker").textContent = company;
+  el("titleH1").textContent = product;
+  document.title = `${company} | ${product}`;
 
-  if (productImg) {
-    productImg.src = productImage;
-    productImg.alt = `${company} product image`;
+  el("priceLabel").textContent = priceLabel;
+  el("priceValue").textContent = priceValue;
+  el("priceNote").textContent  = priceNote;
+
+  el("watermark").textContent = watermark;
+
+  // Footer year
+  const yearEl = el("year");
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+  // ---- Product image
+  const img = el("brochureImg");
+  const imgNoJs = el("brochureImgNoJs");
+  const modalImg = el("modalImg");
+  const hintText = el("imgHintText");
+
+  if (img) {
+    img.src = productImage;
+    img.alt = `${company} product image`;
   }
-  if (productImgNoJs) {
-    productImgNoJs.src = productImage;
-    productImgNoJs.alt = `${company} product image`;
+  if (imgNoJs) {
+    imgNoJs.src = productImage;
+    imgNoJs.alt = `${company} product image`;
   }
   if (modalImg) {
     modalImg.src = productImage;
-    modalImg.alt = `${company} product enlarged view`;
+    modalImg.alt = `${company} product image enlarged`;
+  }
+  if (hintText) hintText.textContent = "Tap the product image to zoom in.";
+
+  // ---- Badges
+  const badgeRow = el("badgeRow");
+  badgeRow.innerHTML = "";
+  badges.forEach((b) => {
+    const txt = safeStr(b, "");
+    if (!txt) return;
+    const div = document.createElement("div");
+    div.className = "badge";
+    div.textContent = txt;
+    badgeRow.appendChild(div);
+  });
+
+  // ---- Features
+  const list = el("featureList");
+  list.innerHTML = "";
+  features.forEach((f) => {
+    const txt = safeStr(f, "");
+    if (!txt) return;
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
+    li.querySelector(".liText").textContent = txt;
+    list.appendChild(li);
+  });
+
+  // ---- Helpers for buttons
+  function disableBtn(a) {
+    if (!a) return;
+    a.setAttribute("aria-disabled", "true");
+    a.style.opacity = "0.45";
+    a.style.pointerEvents = "none";
+    a.removeAttribute("href");
   }
 
-  // ---- modal open/close
+  // phone sanitizer
+  const digits = rawPhone.replace(/\D/g, "");
+  const phoneForLinks = digits.length === 10 ? ("1" + digits) : digits; // 1209...
+  const telHref = phoneForLinks ? ("tel:+" + phoneForLinks) : null;
+  const smsHref = phoneForLinks ? ("sms:+" + phoneForLinks) : null;
+  const mailHref = email ? ("mailto:" + email) : null;
+
+  const textBtn = el("textBtn");
+  const callBtn = el("callBtn");
+  const emailBtn = el("emailBtn");
+  const webBtn = el("webBtn");
+
+  // ---- Tier rules for “basic CTAs”
+  // Starter: no action buttons
+  // Pro: Text/Call/Email/Website
+  // Elite: Text/Call/Email/Website + Elite extras
+  const showBasicCTAs = (TIER === "pro" || TIER === "elite");
+
+  if (!showBasicCTAs) {
+    // hide the whole CTA row for starter
+    const ctaRow = el("ctaRow");
+    if (ctaRow) ctaRow.style.display = "none";
+  } else {
+    // set links (or disable)
+    if (textBtn) (smsHref ? (textBtn.href = smsHref) : disableBtn(textBtn));
+    if (callBtn) (telHref ? (callBtn.href = telHref) : disableBtn(callBtn));
+    if (emailBtn) (mailHref ? (emailBtn.href = mailHref) : disableBtn(emailBtn));
+    if (webBtn) (website ? (webBtn.href = website) : disableBtn(webBtn));
+  }
+
+  // ---- Elite extras block
+  const eliteBlock = el("eliteBlock");
+  if (eliteBlock) {
+    eliteBlock.style.display = (TIER === "elite") ? "" : "none";
+  }
+
+  // Elite “Request More Info” button
+  const requestInfoBtn = el("requestInfoBtn");
+  if (requestInfoBtn) {
+    if (TIER === "elite" && requestInfoUrl) {
+      requestInfoBtn.href = requestInfoUrl;
+    } else {
+      disableBtn(requestInfoBtn);
+    }
+  }
+
+  // Elite Social Proof
+  const socialWrap = el("socialProof");
+  if (socialWrap) {
+    socialWrap.innerHTML = "";
+    if (TIER === "elite" && socialProof.length) {
+      socialProof.forEach((item) => {
+        const text = (typeof item === "string") ? item : safeStr(item?.text, "");
+        const name = (typeof item === "object") ? safeStr(item?.name, "") : "";
+        if (!text) return;
+
+        const card = document.createElement("div");
+        card.style.border = "1px solid rgba(255,255,255,.10)";
+        card.style.background = "rgba(0,0,0,.12)";
+        card.style.borderRadius = "14px";
+        card.style.padding = "12px 14px";
+        card.style.fontSize = "14px";
+
+        card.innerHTML = `<div style="opacity:.92;">“${text}”</div>${
+          name ? `<div style="margin-top:6px; opacity:.65; font-size:12px;">— ${name}</div>` : ""
+        }`;
+
+        socialWrap.appendChild(card);
+      });
+    }
+  }
+
+  // Elite Advanced Embed
+  const embedWrap = el("advancedEmbed");
+  if (embedWrap) {
+    if (TIER === "elite" && (embedHtml || embedUrl)) {
+      embedWrap.style.display = "block";
+      embedWrap.style.marginTop = "10px";
+
+      if (embedHtml) {
+        // trust ONLY if you control the content
+        embedWrap.innerHTML = embedHtml;
+      } else if (embedUrl) {
+        embedWrap.innerHTML = `
+          <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.12); border-radius:14px; overflow:hidden;">
+            <div style="position:relative; width:100%; padding-top:56.25%;">
+              <iframe
+                src="${embedUrl}"
+                title="Embedded content"
+                style="position:absolute; inset:0; width:100%; height:100%; border:0;"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      embedWrap.style.display = "none";
+      embedWrap.innerHTML = "";
+    }
+  }
+
+  // ---- Modal open/close
   const modal = el("modal");
   const openModalBtn = el("openModal");
   const modalClose = el("modalClose");
@@ -116,6 +255,7 @@
   }
 
   if (openModalBtn) openModalBtn.addEventListener("click", openModal);
+
   if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
@@ -127,179 +267,6 @@
     if (e.key === "Escape" && modal && modal.classList.contains("open")) closeModal();
   });
 
-  // ---- contact links
-  const rawPhone = safeStr(cfg.contact?.phone, "");
-  const phoneDigits = digitsOnly(rawPhone);
-  const phoneForLinks = phoneDigits.length === 10 ? ("1" + phoneDigits) : phoneDigits; // assumes US if 10 digits
-  const telHref = phoneForLinks ? ("tel:+" + phoneForLinks) : null;
-  const smsHref = phoneForLinks ? ("sms:+" + phoneForLinks) : null;
-
-  const email = safeStr(cfg.contact?.email, "");
-  const emailHref = email ? (`mailto:${encodeURIComponent(email)}`) : null;
-
-  const website = safeStr(cfg.contact?.website, "");
-  const webHref = (website && isHttps(website)) ? website : null;
-
-  // ---- buttons
-  const ctaRow = el("ctaRow");
-  const primaryBtn = el("primaryBtn");
-  const textBtn = el("textBtn");
-  const callBtn = el("callBtn");
-  const emailBtn = el("emailBtn");
-  const webBtn = el("webBtn");
-  const webBtnNoJs = el("webBtnNoJs");
-
-  // no-js website fallback
-  if (webBtnNoJs) {
-    if (webHref) webBtnNoJs.href = webHref;
-    else disableBtn(webBtnNoJs);
-  }
-
-  // Tier rules:
-  // Starter: NO buttons
-  // Pro: Text/Call/Email/Website
-  // Elite: Pro buttons + Primary CTA + elite sections
-  const isStarter = TIER === "starter";
-  const isPro = TIER === "pro";
-  const isElite = TIER === "elite";
-
-  if (ctaRow) {
-    if (isStarter) {
-      ctaRow.style.display = "none";
-    } else {
-      ctaRow.style.display = "";
-    }
-  }
-
-  // Primary CTA (Elite only)
-  const primaryCfg = cfg.primaryCta || {};
-  const primaryEnabledFlag = (typeof primaryCfg.enabled === "boolean") ? primaryCfg.enabled : true;
-  const primaryLabel = safeStr(primaryCfg.label, "Request Info");
-  const primaryUrl = safeStr(primaryCfg.url, "");
-
-  if (primaryBtn) {
-    primaryBtn.textContent = primaryLabel;
-
-    if (!isElite || !primaryEnabledFlag || !isHttps(primaryUrl)) {
-      primaryBtn.style.display = "none";
-      disableBtn(primaryBtn);
-    } else {
-      primaryBtn.style.display = "";
-      showBtn(primaryBtn);
-      primaryBtn.href = primaryUrl;
-      primaryBtn.target = "_blank";
-      primaryBtn.rel = "noopener";
-    }
-  }
-
-  // Pro/Elite basics
-  function setOrDisable(a, href) {
-    if (!a) return;
-    if (isStarter) {
-      a.style.display = "none";
-      return;
-    }
-    // pro + elite: show
-    a.style.display = "";
-    if (href) {
-      showBtn(a);
-      a.href = href;
-    } else {
-      disableBtn(a);
-    }
-  }
-
-  setOrDisable(textBtn, smsHref);
-  setOrDisable(callBtn, telHref);
-  setOrDisable(emailBtn, emailHref);
-  setOrDisable(webBtn, webHref);
-
-  // ---- Elite-only: social proof
-  const socialProofWrap = el("socialProofWrap");
-  const testimonialList = el("testimonialList");
-
-  if (socialProofWrap && testimonialList) {
-    if (!isElite) {
-      socialProofWrap.style.display = "none";
-    } else {
-      const testimonials = Array.isArray(cfg.testimonials) ? cfg.testimonials : [];
-      testimonialList.innerHTML = "";
-
-      if (testimonials.length === 0) {
-        socialProofWrap.style.display = "none";
-      } else {
-        socialProofWrap.style.display = "";
-        testimonials.forEach(t => {
-          const txt = safeStr(t, "");
-          if (!txt) return;
-          const li = document.createElement("li");
-          li.innerHTML = `<span class="check" aria-hidden="true">★</span><span class="liText"></span>`;
-          li.querySelector(".liText").textContent = txt;
-          testimonialList.appendChild(li);
-        });
-      }
-    }
-  }
-
-  // ---- Elite-only: embedded content
-  const embedWrap = el("embedWrap");
-  const embedList = el("embedList");
-
-  if (embedWrap && embedList) {
-    if (!isElite) {
-      embedWrap.style.display = "none";
-    } else {
-      const embeds = Array.isArray(cfg.embeds) ? cfg.embeds : [];
-      embedList.innerHTML = "";
-
-      // Only allow HTTPS iframes to avoid broken/unsafe embeds
-      const safeEmbeds = embeds
-        .map(e => ({
-          title: safeStr(e?.title, ""),
-          src: safeStr(e?.src, ""),
-          height: Number(e?.height || 360)
-        }))
-        .filter(e => e.src && isHttps(e.src));
-
-      if (safeEmbeds.length === 0) {
-        embedWrap.style.display = "none";
-      } else {
-        embedWrap.style.display = "";
-        safeEmbeds.forEach(e => {
-          const wrap = document.createElement("div");
-          wrap.style.marginTop = "12px";
-          wrap.style.border = "1px solid rgba(255,255,255,.10)";
-          wrap.style.borderRadius = "14px";
-          wrap.style.overflow = "hidden";
-          wrap.style.background = "rgba(0,0,0,.12)";
-
-          if (e.title) {
-            const title = document.createElement("div");
-            title.style.padding = "10px 12px";
-            title.style.fontWeight = "850";
-            title.style.color = "rgba(236,246,255,.85)";
-            title.style.fontSize = "13px";
-            title.textContent = e.title;
-            wrap.appendChild(title);
-          }
-
-          const iframe = document.createElement("iframe");
-          iframe.src = e.src;
-          iframe.title = e.title || "Embedded content";
-          iframe.loading = "lazy";
-          iframe.referrerPolicy = "no-referrer";
-          iframe.allowFullscreen = true;
-          iframe.style.width = "100%";
-          iframe.style.height = `${Math.max(220, Math.min(900, e.height))}px`;
-          iframe.style.border = "0";
-          wrap.appendChild(iframe);
-
-          embedList.appendChild(wrap);
-        });
-      }
-    }
-  }
-
   // ---- Price shine once
   const priceEl = el("priceValue");
   window.addEventListener("load", () => {
@@ -308,7 +275,7 @@
     setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
   });
 
-  // ---- Ripple effect (buttons only)
+  // ---- Ripple effect (buttons)
   function addRipple(e) {
     const btn = e.currentTarget;
     if (!btn || btn.getAttribute("aria-disabled") === "true") return;
@@ -331,7 +298,7 @@
     ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
   }
 
-  document.querySelectorAll(".btn").forEach(btn => {
+  document.querySelectorAll(".btn").forEach((btn) => {
     btn.addEventListener("click", addRipple);
     btn.addEventListener("touchstart", addRipple, { passive: true });
   });
