@@ -29,7 +29,7 @@ window.BROCHURE_CONFIG = {
     "Lifetime Warranty"
   ],
 
-  brochureImage: "brochure.png",
+  brochureImage: "product.png",
 
   contact: {
     phone: "12097694750",
