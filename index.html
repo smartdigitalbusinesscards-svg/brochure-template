@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Smart Digital Brochure</title>
 
-  <!-- ✅ Correct path: CSS lives in /shared/ -->
+  <!-- ✅ CSS is inside /shared/ -->
   <link rel="stylesheet" href="./shared/shared.css" />
 
-  <!-- If JS is blocked, at least show something readable -->
   <noscript>
     <style>
       .jsOnly{ display:none !important; }
@@ -31,13 +30,11 @@
     </header>
 
     <div class="grid">
-      <!-- BROCHURE IMAGE CARD -->
       <section class="card imgCard">
         <button class="imgBtn jsOnly" id="openModal" type="button" aria-label="Open brochure image">
           <img id="brochureImg" src="brochure.png" alt="Brochure" />
         </button>
 
-        <!-- Fallback for no-js -->
         <div class="noJs" style="display:none;">
           <img id="brochureImgNoJs" src="brochure.png" alt="Brochure" />
         </div>
@@ -48,7 +45,6 @@
         </div>
       </section>
 
-      <!-- DETAILS CARD -->
       <section class="card infoCard">
         <div class="priceRow">
           <div>
@@ -61,15 +57,11 @@
         <ul id="featureList" aria-label="Included features"></ul>
 
         <div class="ctaRow" id="ctaRow">
-          <!-- CTA (optional by tier) -->
           <a class="btn primary jsOnly" href="#" id="viewBtn">View Brochure</a>
-
-          <!-- Contact buttons (these are your “basic CTAs” for Pro/Elite) -->
           <a class="btn jsOnly" href="#" id="textBtn">Text</a>
           <a class="btn jsOnly" href="#" id="callBtn">Call</a>
           <a class="btn jsOnly" href="#" id="webBtn" target="_blank" rel="noopener">Website</a>
 
-          <!-- No-JS fallback -->
           <div class="noJs" style="display:none;">
             <a class="btn primary" href="brochure.png" target="_blank" rel="noopener">View Brochure</a>
           </div>
@@ -85,7 +77,6 @@
     <div class="watermark" id="watermark">Installed by Company</div>
   </div>
 
-  <!-- MODAL -->
   <div class="modal jsOnly" id="modal" role="dialog" aria-modal="true" aria-label="Brochure preview">
     <div class="modalInner">
       <img class="modalImg" src="brochure.png" id="modalImg" alt="Brochure enlarged view" />
@@ -93,10 +84,10 @@
     </div>
   </div>
 
-  <!-- ✅ Load config FIRST (defines window.BROCHURE_CONFIG) -->
+  <!-- ✅ Config first -->
   <script src="./shared/config.js"></script>
 
-  <!-- ✅ Then load shared logic -->
+  <!-- ✅ Then shared logic -->
   <script src="./shared/shared.js"></script>
 </body>
 </html>
