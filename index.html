@@ -58,6 +58,28 @@
 
         <ul id="featureList" aria-label="Included features"></ul>
 
+        <!-- ELITE ONLY (hidden by default; shared.js will turn it on for Elite) -->
+<section class="card eliteBlock" id="eliteBlock" style="display:none; margin-top:16px;">
+  <div style="padding:16px;">
+    <div style="font-weight:900; letter-spacing:.10em; text-transform:uppercase; font-size:12px; opacity:.78;">
+      Elite Extras
+    </div>
+
+    <div style="margin-top:10px; display:grid; gap:10px;">
+      <!-- Booking / Request Info button (Elite only) -->
+      <a class="btn primary jsOnly" href="#" id="requestInfoBtn" target="_blank" rel="noopener">
+        Request More Info
+      </a>
+
+      <!-- Social proof (Elite only) -->
+      <div id="socialProof" style="display:grid; gap:10px;"></div>
+
+      <!-- Advanced embedded content container (Elite only) -->
+      <div id="advancedEmbed" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
         <!-- CTA ROW (tier-controlled) -->
         <div class="ctaRow jsOnly" id="ctaRow" aria-label="Action buttons">
           <!-- Elite primary CTA -->
