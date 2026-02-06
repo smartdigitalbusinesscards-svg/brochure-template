@@ -127,9 +127,71 @@
     </div>
   </div>
 
-  <!-- Config first -->
-  <script src="./shared/config.js"></script>
-  <!-- Then shared logic -->
-  <script src="./shared/shared.js"></script>
+  <script>
+  // ===== CUSTOMER CONFIG (Make edits ONLY this block) =====
+  window.BIZ = {
+    tier: "pro", // "starter" | "pro" | "elite"  (lowercase)
+
+    // Brand / header
+    company: "Select Source Water",
+    offerTitle: "Hygia Whole-Home Filtration + Softener",
+    watermark: "Installed by Select Source Water",
+
+    // Pricing
+    priceLabel: "Pricing",
+    priceValue: "Your Price Here",
+    priceNote: "Based on Your Home & Setup",
+
+    // Optional theme override (or we can switch this to data-theme later)
+    theme: {
+      bgA: "#04151f",
+      bgB: "#0a2f3f",
+      accent: "#4fe3ff",
+      accent2: "#63ffb2"
+    },
+
+    // Badges row
+    badges: [
+      "Custom Dual-Tank",
+      "RO + Alkaline",
+      "Professional Install",
+      "Lifetime Warranty"
+    ],
+
+    // Image
+    productImage: "product.png",
+
+    // Contact buttons (Pro + Elite)
+    phoneTel: "12097694750",
+    email: "info@selectsourcewater.com",
+    website: "https://selectsourcewater.com",
+
+    // Primary CTA (Pro + Elite)
+    primaryCtaLabel: "Request Info",
+    primaryCtaUrl: "https://selectsourcewater.com/intake",
+
+    // Elite-only CTA (in the Elite block)
+    secondaryCtaLabel: "Request More Info",
+    secondaryCtaUrl: "https://selectsourcewater.com/intake",
+
+    // Elite-only extras
+    socialProof: [
+      { text: "Install was quick and the water tastes incredible.", name: "Homeowner" },
+      { text: "We noticed the difference immediately—highly recommend.", name: "Referral Partner" }
+    ],
+    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    // embedHtml: "<div>...</div>",
+
+    // Feature list
+    features: [
+      "Custom Built Dual Tank Whole Home Water Filtration and Softener",
+      "Reverse Osmosis Alkaline System",
+      "Professional Install",
+      "Lifetime Warranty"
+    ]
+  };
+</script>
+
+<script src="./shared/shared.js"></script>
 </body>
 </html>
