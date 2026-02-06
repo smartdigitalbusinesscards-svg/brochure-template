@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Smart Digital Brochure</title>
 
-  <!-- CSS is inside /shared/ -->
   <link rel="stylesheet" href="./shared/shared.css" />
 
   <noscript>
@@ -58,31 +57,31 @@
 
         <ul id="featureList" aria-label="Included features"></ul>
 
-        <!-- ELITE ONLY (hidden by default; shared.js will turn it on for Elite) -->
-<section class="card eliteBlock" id="eliteBlock" style="display:none; margin-top:16px;">
-  <div style="padding:16px;">
-    <div style="font-weight:900; letter-spacing:.10em; text-transform:uppercase; font-size:12px; opacity:.78;">
-      Elite Extras
-    </div>
+        <!-- ELITE ONLY (shared.js turns it on for Elite) -->
+        <section class="card eliteBlock" id="eliteBlock" style="display:none; margin-top:16px;">
+          <div style="padding:16px;">
+            <div style="font-weight:900; letter-spacing:.10em; text-transform:uppercase; font-size:12px; opacity:.78;">
+              Elite Extras
+            </div>
 
-    <div style="margin-top:10px; display:grid; gap:10px;">
-      <!-- Booking / Request Info button (Elite only) -->
-      <a class="btn primary jsOnly" href="#" id="requestInfoBtn" target="_blank" rel="noopener">
-        Request More Info
-      </a>
+            <div style="margin-top:10px; display:grid; gap:10px;">
+              <!-- Booking / Request Info button (Elite only) -->
+              <a class="btn primary jsOnly" href="#" id="requestInfoBtn" target="_blank" rel="noopener">
+                Request More Info
+              </a>
 
-      <!-- Social proof (Elite only) -->
-      <div id="socialProof" style="display:grid; gap:10px;"></div>
+              <!-- Social proof cards (Elite only) -->
+              <div id="socialProof" style="display:grid; gap:10px;"></div>
 
-      <!-- Advanced embedded content container (Elite only) -->
-      <div id="advancedEmbed" style="display:none;"></div>
-    </div>
-  </div>
-</section>
+              <!-- Advanced embedded content container (Elite only) -->
+              <div id="advancedEmbed" style="display:none;"></div>
+            </div>
+          </div>
+        </section>
 
         <!-- CTA ROW (tier-controlled) -->
         <div class="ctaRow jsOnly" id="ctaRow" aria-label="Action buttons">
-          <!-- Elite primary CTA -->
+          <!-- Pro/Elite primary CTA -->
           <a class="btn primary" href="#" id="primaryBtn">Request Info</a>
 
           <!-- Pro/Elite basics -->
@@ -92,11 +91,10 @@
           <a class="btn" href="#" id="webBtn" target="_blank" rel="noopener">Website</a>
         </div>
 
-        <!-- No-JS fallback (shows just the website if provided in config.js) -->
+        <!-- No-JS fallback (shows just the website if provided) -->
         <div class="noJs" style="display:none; margin-top:14px;">
           <a class="btn" href="#" id="webBtnNoJs" target="_blank" rel="noopener">Website</a>
         </div>
-
       </section>
     </div>
 
@@ -116,69 +114,67 @@
     </div>
   </div>
 
-  <script>
   <!-- BIZ_START -->
-<script>
-window.BIZ = {
-  // ...customer data...
-    tier: "pro", // "starter" | "pro" | "elite"  (lowercase)
+  <script>
+    // ===== CUSTOMER CONFIG (Edit ONLY this block) =====
+    window.BIZ = {
+      tier: "pro", // "starter" | "pro" | "elite"  (lowercase)
 
-    // Brand / header
-    company: "Select Source Water",
-    offerTitle: "Hygia Whole-Home Filtration + Softener",
-    watermark: "Installed by Select Source Water",
+      // Theme token (starter forced to aqua): "aqua" | "mint" | "midnight" | "graphite" | "ember" | "royal" | "elegantPink"
+      theme: "aqua",
 
-    // Pricing
-    priceLabel: "Pricing",
-    priceValue: "Your Price Here",
-    priceNote: "Based on Your Home & Setup",
+      // Brand / header
+      company: "Select Source Water",
+      offerTitle: "Hygia Whole-Home Filtration + Softener",
+      watermark: "Installed by Select Source Water",
 
-    // Theme token (starter forced to aqua): "aqua" | "mint" | "midnight" | "graphite" | "ember" | "royal" | "elegantPink"
-    theme: "aqua",
+      // Pricing
+      priceLabel: "Pricing",
+      priceValue: "Your Price Here",
+      priceNote: "Based on Your Home & Setup",
 
-    // Badges row
-    badges: [
-      "Custom Dual-Tank",
-      "RO + Alkaline",
-      "Professional Install",
-      "Lifetime Warranty"
-    ],
+      // Badges row
+      badges: [
+        "Custom Dual-Tank",
+        "RO + Alkaline",
+        "Professional Install",
+        "Lifetime Warranty"
+      ],
 
-    // Image
-    productImage: "product.png",
+      // Image
+      productImage: "product.png",
 
-    // Contact buttons (Pro + Elite)
-    phoneTel: "12097694750",
-    email: "info@selectsourcewater.com",
-    website: "https://selectsourcewater.com",
+      // Contact buttons (Pro + Elite)
+      phoneTel: "12097694750",
+      email: "info@selectsourcewater.com",
+      website: "https://selectsourcewater.com",
 
-    // Primary CTA (Pro + Elite)
-    primaryCtaLabel: "Request Info",
-    primaryCtaUrl: "https://selectsourcewater.com/intake",
+      // Primary CTA (Pro + Elite)
+      primaryCtaLabel: "Request Info",
+      primaryCtaUrl: "https://selectsourcewater.com/intake",
 
-    // Elite-only CTA (in the Elite block)
-    secondaryCtaLabel: "Request More Info",
-    secondaryCtaUrl: "https://selectsourcewater.com/intake",
+      // Elite-only CTA (inside Elite block)
+      secondaryCtaLabel: "Request More Info",
+      secondaryCtaUrl: "https://selectsourcewater.com/intake",
 
-    // Elite-only extras
-    socialProof: [
-      { text: "Install was quick and the water tastes incredible.", name: "Homeowner" },
-      { text: "We noticed the difference immediately—highly recommend.", name: "Referral Partner" }
-    ],
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    // embedHtml: "<div>...</div>",
+      // Elite-only extras
+      socialProof: [
+        { text: "Install was quick and the water tastes incredible.", name: "Homeowner" },
+        { text: "We noticed the difference immediately—highly recommend.", name: "Referral Partner" }
+      ],
+      embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
 
-    // Feature list
-    features: [
-      "Custom Built Dual Tank Whole Home Water Filtration and Softener",
-      "Reverse Osmosis Alkaline System",
-      "Professional Install",
-      "Lifetime Warranty"
-    ]
-  };
-</script>
-<!-- BIZ_END -->
-  
-<script src="./shared/shared.js"></script>
+      // Feature list
+      features: [
+        "Custom Built Dual Tank Whole Home Water Filtration and Softener",
+        "Reverse Osmosis Alkaline System",
+        "Professional Install",
+        "Lifetime Warranty"
+      ]
+    };
+  </script>
+  <!-- BIZ_END -->
+
+  <script src="./shared/shared.js"></script>
 </body>
 </html>
