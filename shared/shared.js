@@ -130,15 +130,80 @@
     if (modalImg) { modalImg.src = productImage; modalImg.alt = `${company} product image enlarged`; }
     if (hintText) hintText.textContent = "Tap the product image to zoom in.";
 
-    // ---- Theme vars (optional)
-    // If you want brochure themes like eCards, we can switch this to data-theme later.
-    if (B.theme && typeof B.theme === "object") {
-      const root = document.documentElement.style;
-      if (B.theme.accent)  root.setProperty("--accent",  B.theme.accent);
-      if (B.theme.accent2) root.setProperty("--accent2", B.theme.accent2);
-      if (B.theme.bgA)     root.setProperty("--bgA",     B.theme.bgA);
-      if (B.theme.bgB)     root.setProperty("--bgB",     B.theme.bgB);
-    }
+    // ---- Theme (token-based like eCards)
+// Starter is ALWAYS forced to aqua.
+// Pro/Elite can use: aqua, mint, midnight, graphite, ember, royal, elegantPink
+const THEMES = {
+  aqua: {
+    bgA: "#04151f",
+    bgB: "#0a2f3f",
+    accent: "#4fe3ff",
+    accent2: "#63ffb2",
+  },
+  mint: {
+    bgA: "#061a16",
+    bgB: "#0b2a24",
+    accent: "#63ffb2",
+    accent2: "#4fe3ff",
+  },
+  midnight: {
+    bgA: "#050916",
+    bgB: "#0a1535",
+    accent: "#4aa8ff",
+    accent2: "#7c5cff",
+  },
+  graphite: {
+    bgA: "#070A12",
+    bgB: "#0B1222",
+    accent: "#4aa8ff",
+    accent2: "#34f7ff",
+  },
+  ember: {
+    bgA: "#120606",
+    bgB: "#2a0b0b",
+    accent: "#ff5a3d",
+    accent2: "#ffb84a",
+  },
+  royal: {
+    bgA: "#07051a",
+    bgB: "#130a33",
+    accent: "#7c5cff",
+    accent2: "#4aa8ff",
+  },
+  elegantPink: {
+    bgA: "#16070f",
+    bgB: "#2a0c1c",
+    accent: "#ff5fa2",
+    accent2: "#ffd1e6",
+  },
+};
+
+const applyThemeVars = (tObj) => {
+  if (!tObj) return;
+  const root = document.documentElement.style;
+  if (tObj.accent)  root.setProperty("--accent",  tObj.accent);
+  if (tObj.accent2) root.setProperty("--accent2", tObj.accent2);
+  if (tObj.bgA)     root.setProperty("--bgA",     tObj.bgA);
+  if (tObj.bgB)     root.setProperty("--bgB",     tObj.bgB);
+};
+
+// B.theme can be either:
+// - a token string (recommended): "aqua", "mint", etc.
+// - an object override (legacy support)
+let themeToken = (typeof B.theme === "string") ? B.theme.trim() : "";
+themeToken = themeToken.toLowerCase();
+
+// Enforce tier rule: starter always aqua
+if (tier === "starter") themeToken = "aqua";
+
+// If token is valid, apply it
+if (themeToken && THEMES[themeToken]) {
+  applyThemeVars(THEMES[themeToken]);
+}
+// Otherwise, allow legacy object override
+else if (B.theme && typeof B.theme === "object") {
+  applyThemeVars(B.theme);
+}
 
     // ---- Badges
     const badges = Array.isArray(B.badges) ? B.badges : [];
