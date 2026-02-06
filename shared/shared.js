@@ -1,305 +1,373 @@
 // shared/shared.js
-(function () {
-  const cfg = window.BROCHURE_CONFIG || {};
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- helpers ----------
+  const isPlaceholder = (v) =>
+    !v || String(v).trim() === "" || /^REPLACE_/i.test(String(v).trim());
 
   const safeStr = (v, fallback = "") =>
     typeof v === "string" && v.trim() ? v.trim() : fallback;
 
-  const getParam = (key) => {
-    try {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(key);
-    } catch {
-      return null;
-    }
+  const normUrl = (u) => {
+    if (isPlaceholder(u)) return "";
+    const s = String(u).trim();
+    if (!s) return "";
+    if (/^https?:\/\//i.test(s)) return s;
+    return "https://" + s.replace(/^\/+/, "");
   };
 
-  // Tier: allow ?tier=starter|pro|elite override for testing
-  const tierFromCfg = safeStr(cfg.tier, "starter").toLowerCase();
-  const tierFromUrl = safeStr(getParam("tier"), "").toLowerCase();
-  const tierRaw = (tierFromUrl || tierFromCfg);
-  const TIER = (tierRaw === "pro" || tierRaw === "elite") ? tierRaw : "starter";
-
-  const el = (id) => document.getElementById(id);
-
-  // ---- Brand
-  const company = safeStr(cfg.brand?.company, "Company");
-  const product = safeStr(cfg.brand?.product, "Offer Title");
-  const watermark = safeStr(cfg.brand?.watermark, `Installed by ${company}`);
-
-  // ---- Pricing
-  const priceLabel = safeStr(cfg.pricing?.label, "Total Price");
-  const priceValue = safeStr(cfg.pricing?.value, "$0");
-  const priceNote  = safeStr(cfg.pricing?.note, "One-time total");
-
-  // ---- Images (you renamed to product.png)
-  const productImage = safeStr(cfg.productImage, safeStr(cfg.brochureImage, "product.png"));
-
-  // ---- Contact + Elite Extras
-  const rawPhone = safeStr(cfg.contact?.phone, "");
-  const email    = safeStr(cfg.contact?.email, "");
-  const website  = safeStr(cfg.contact?.website, "");
-
-  // Elite-only CTA URL (intake form / request info)
-  const requestInfoUrl =
-    safeStr(cfg.elite?.requestInfoUrl, safeStr(cfg.contact?.requestInfoUrl, ""));
-
-  // Elite-only social proof
-  const socialProof = Array.isArray(cfg.elite?.socialProof) ? cfg.elite.socialProof : [];
-
-  // Elite-only embedded content
-  // Option A: embedHtml (full HTML string)
-  // Option B: embedUrl (iframe URL)
-  const embedHtml = safeStr(cfg.elite?.embedHtml, "");
-  const embedUrl  = safeStr(cfg.elite?.embedUrl, "");
-
-  // ---- Badges + Features
-  const badges = Array.isArray(cfg.badges) ? cfg.badges : [];
-  const features = Array.isArray(cfg.features) ? cfg.features : [];
-
-  // ---- Apply theme vars (optional)
-  if (cfg.theme) {
-    const root = document.documentElement.style;
-    if (cfg.theme.accent)  root.setProperty("--accent",  cfg.theme.accent);
-    if (cfg.theme.accent2) root.setProperty("--accent2", cfg.theme.accent2);
-    if (cfg.theme.bgA)     root.setProperty("--bgA",     cfg.theme.bgA);
-    if (cfg.theme.bgB)     root.setProperty("--bgB",     cfg.theme.bgB);
-  }
-
-  // ---- Inject text
-  el("kicker").textContent = company;
-  el("titleH1").textContent = product;
-  document.title = `${company} | ${product}`;
-
-  el("priceLabel").textContent = priceLabel;
-  el("priceValue").textContent = priceValue;
-  el("priceNote").textContent  = priceNote;
-
-  el("watermark").textContent = watermark;
-
-  // Footer year
-  const yearEl = el("year");
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-  // ---- Product image
-  const img = el("brochureImg");
-  const imgNoJs = el("brochureImgNoJs");
-  const modalImg = el("modalImg");
-  const hintText = el("imgHintText");
-
-  if (img) {
-    img.src = productImage;
-    img.alt = `${company} product image`;
-  }
-  if (imgNoJs) {
-    imgNoJs.src = productImage;
-    imgNoJs.alt = `${company} product image`;
-  }
-  if (modalImg) {
-    modalImg.src = productImage;
-    modalImg.alt = `${company} product image enlarged`;
-  }
-  if (hintText) hintText.textContent = "Tap the product image to zoom in.";
-
-  // ---- Badges
-  const badgeRow = el("badgeRow");
-  badgeRow.innerHTML = "";
-  badges.forEach((b) => {
-    const txt = safeStr(b, "");
-    if (!txt) return;
-    const div = document.createElement("div");
-    div.className = "badge";
-    div.textContent = txt;
-    badgeRow.appendChild(div);
-  });
-
-  // ---- Features
-  const list = el("featureList");
-  list.innerHTML = "";
-  features.forEach((f) => {
-    const txt = safeStr(f, "");
-    if (!txt) return;
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
-    li.querySelector(".liText").textContent = txt;
-    list.appendChild(li);
-  });
-
-  // ---- Helpers for buttons
-  function disableBtn(a) {
+  const disableBtn = (a) => {
     if (!a) return;
     a.setAttribute("aria-disabled", "true");
     a.style.opacity = "0.45";
     a.style.pointerEvents = "none";
     a.removeAttribute("href");
-  }
+    a.removeAttribute("target");
+    a.removeAttribute("rel");
+  };
 
-  // phone sanitizer
-  const digits = rawPhone.replace(/\D/g, "");
-  const phoneForLinks = digits.length === 10 ? ("1" + digits) : digits; // 1209...
-  const telHref = phoneForLinks ? ("tel:+" + phoneForLinks) : null;
-  const smsHref = phoneForLinks ? ("sms:+" + phoneForLinks) : null;
-  const mailHref = email ? ("mailto:" + email) : null;
+  const enableHref = (a, href) => {
+    if (!a) return;
+    if (!href) return disableBtn(a);
 
-  const textBtn = el("textBtn");
-  const callBtn = el("callBtn");
-  const emailBtn = el("emailBtn");
-  const webBtn = el("webBtn");
+    a.setAttribute("aria-disabled", "false");
+    a.style.opacity = "";
+    a.style.pointerEvents = "";
+    a.setAttribute("href", href);
 
-  // ---- Tier rules for “basic CTAs”
-  // Starter: no action buttons
-  // Pro: Text/Call/Email/Website
-  // Elite: Text/Call/Email/Website + Elite extras
-  const showBasicCTAs = (TIER === "pro" || TIER === "elite");
-
-  if (!showBasicCTAs) {
-    // hide the whole CTA row for starter
-    const ctaRow = el("ctaRow");
-    if (ctaRow) ctaRow.style.display = "none";
-  } else {
-    // set links (or disable)
-    if (textBtn) (smsHref ? (textBtn.href = smsHref) : disableBtn(textBtn));
-    if (callBtn) (telHref ? (callBtn.href = telHref) : disableBtn(callBtn));
-    if (emailBtn) (mailHref ? (emailBtn.href = mailHref) : disableBtn(emailBtn));
-    if (webBtn) (website ? (webBtn.href = website) : disableBtn(webBtn));
-  }
-
-  // ---- Elite extras block
-  const eliteBlock = el("eliteBlock");
-  if (eliteBlock) {
-    eliteBlock.style.display = (TIER === "elite") ? "" : "none";
-  }
-
-  // Elite “Request More Info” button
-  const requestInfoBtn = el("requestInfoBtn");
-  if (requestInfoBtn) {
-    if (TIER === "elite" && requestInfoUrl) {
-      requestInfoBtn.href = requestInfoUrl;
+    if (/^https?:\/\//i.test(href)) {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener");
     } else {
-      disableBtn(requestInfoBtn);
+      a.removeAttribute("target");
+      a.removeAttribute("rel");
     }
-  }
+  };
 
-  // Elite Social Proof
-  const socialWrap = el("socialProof");
-  if (socialWrap) {
-    socialWrap.innerHTML = "";
-    if (TIER === "elite" && socialProof.length) {
-      socialProof.forEach((item) => {
-        const text = (typeof item === "string") ? item : safeStr(item?.text, "");
-        const name = (typeof item === "object") ? safeStr(item?.name, "") : "";
-        if (!text) return;
+  const buildTel = (rawDigits) => {
+    const digits = String(rawDigits || "").replace(/\D/g, "");
+    if (!digits) return { tel: "", sms: "" };
+    const phone = digits.length === 10 ? ("1" + digits) : digits; // allow 10-digit US -> +1
+    return {
+      tel: `tel:+${phone}`,
+      sms: `sms:+${phone}`,
+    };
+  };
 
-        const card = document.createElement("div");
-        card.style.border = "1px solid rgba(255,255,255,.10)";
-        card.style.background = "rgba(0,0,0,.12)";
-        card.style.borderRadius = "14px";
-        card.style.padding = "12px 14px";
-        card.style.fontSize = "14px";
+  // ---------- tier ----------
+  const normalizeTier = (t) => {
+    t = (t || "").toString().trim().toLowerCase();
+    return (t === "starter" || t === "pro" || t === "elite") ? t : null;
+  };
 
-        card.innerHTML = `<div style="opacity:.92;">“${text}”</div>${
-          name ? `<div style="margin-top:6px; opacity:.65; font-size:12px;">— ${name}</div>` : ""
-        }`;
+  const getTier = () => {
+    // Prefer URL override for testing: ?tier=elite
+    const qsTier = normalizeTier(new URLSearchParams(window.location.search).get("tier"));
 
-        socialWrap.appendChild(card);
+    // Fallback to hash: #tier=elite or #?tier=elite
+    const rawHash = (window.location.hash || "").replace(/^#/, "");
+    const hashQuery = rawHash.startsWith("?") ? rawHash.slice(1) : rawHash;
+    const hashTier = normalizeTier(new URLSearchParams(hashQuery).get("tier"));
+
+    const tier = qsTier || hashTier || normalizeTier(window.BIZ?.tier) || "starter";
+    return tier;
+  };
+
+  // ---------- features by tier ----------
+  const FEATURES = {
+    starter: { basicCtas: false, primaryCta: false, eliteExtras: false },
+    pro:     { basicCtas: true,  primaryCta: true,  eliteExtras: false },
+    elite:   { basicCtas: true,  primaryCta: true,  eliteExtras: true  },
+  };
+
+  // ---------- apply ----------
+  const apply = () => {
+    const B = (window.BIZ && typeof window.BIZ === "object") ? window.BIZ : {};
+    const tier = getTier();
+    const f = FEATURES[tier];
+
+    // ---- Brand / headers
+    const company = safeStr(B.company, "Company");
+    const offerTitle = safeStr(B.offerTitle || B.title, "Offer Title"); // allow either key
+    const watermark = safeStr(B.watermark, `Installed by ${company}`);
+
+    const kicker = $("kicker");
+    const titleH1 = $("titleH1");
+    if (kicker) kicker.textContent = company;
+    if (titleH1) titleH1.textContent = offerTitle;
+    document.title = `${company} | ${offerTitle}`;
+
+    const wm = $("watermark");
+    if (wm) wm.textContent = watermark;
+
+    // ---- Pricing
+    const priceLabel = safeStr(B.priceLabel, "Total Price");
+    const priceValue = safeStr(B.priceValue, "$0");
+    const priceNote  = safeStr(B.priceNote, "One-time total");
+
+    const pl = $("priceLabel");
+    const pv = $("priceValue");
+    const pn = $("priceNote");
+    if (pl) pl.textContent = priceLabel;
+    if (pv) pv.textContent = priceValue;
+    if (pn) pn.textContent = priceNote;
+
+    // ---- Footer year
+    const yearEl = $("year");
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+    // ---- Product image (FIXED IDs: productImg / productImgNoJs / modalImg)
+    const productImage = safeStr(B.productImage || B.brochureImage || "product.png");
+
+    const img = $("productImg");
+    const imgNoJs = $("productImgNoJs");
+    const modalImg = $("modalImg");
+    const hintText = $("imgHintText");
+
+    if (img) { img.src = productImage; img.alt = `${company} product image`; }
+    if (imgNoJs) { imgNoJs.src = productImage; imgNoJs.alt = `${company} product image`; }
+    if (modalImg) { modalImg.src = productImage; modalImg.alt = `${company} product image enlarged`; }
+    if (hintText) hintText.textContent = "Tap the product image to zoom in.";
+
+    // ---- Theme vars (optional)
+    // If you want brochure themes like eCards, we can switch this to data-theme later.
+    if (B.theme && typeof B.theme === "object") {
+      const root = document.documentElement.style;
+      if (B.theme.accent)  root.setProperty("--accent",  B.theme.accent);
+      if (B.theme.accent2) root.setProperty("--accent2", B.theme.accent2);
+      if (B.theme.bgA)     root.setProperty("--bgA",     B.theme.bgA);
+      if (B.theme.bgB)     root.setProperty("--bgB",     B.theme.bgB);
+    }
+
+    // ---- Badges
+    const badges = Array.isArray(B.badges) ? B.badges : [];
+    const badgeRow = $("badgeRow");
+    if (badgeRow) {
+      badgeRow.innerHTML = "";
+      badges.forEach((b) => {
+        const txt = safeStr(b, "");
+        if (!txt) return;
+        const div = document.createElement("div");
+        div.className = "badge";
+        div.textContent = txt;
+        badgeRow.appendChild(div);
       });
     }
-  }
 
-  // Elite Advanced Embed
-  const embedWrap = el("advancedEmbed");
-  if (embedWrap) {
-    if (TIER === "elite" && (embedHtml || embedUrl)) {
-      embedWrap.style.display = "block";
-      embedWrap.style.marginTop = "10px";
-
-      if (embedHtml) {
-        // trust ONLY if you control the content
-        embedWrap.innerHTML = embedHtml;
-      } else if (embedUrl) {
-        embedWrap.innerHTML = `
-          <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.12); border-radius:14px; overflow:hidden;">
-            <div style="position:relative; width:100%; padding-top:56.25%;">
-              <iframe
-                src="${embedUrl}"
-                title="Embedded content"
-                style="position:absolute; inset:0; width:100%; height:100%; border:0;"
-                loading="lazy"
-                referrerpolicy="no-referrer"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-        `;
-      }
-    } else {
-      embedWrap.style.display = "none";
-      embedWrap.innerHTML = "";
+    // ---- Features
+    const features = Array.isArray(B.features) ? B.features : [];
+    const list = $("featureList");
+    if (list) {
+      list.innerHTML = "";
+      features.forEach((feat) => {
+        const txt = safeStr(feat, "");
+        if (!txt) return;
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="check" aria-hidden="true">✓</span><span class="liText"></span>`;
+        li.querySelector(".liText").textContent = txt;
+        list.appendChild(li);
+      });
     }
-  }
 
-  // ---- Modal open/close
-  const modal = el("modal");
-  const openModalBtn = el("openModal");
-  const modalClose = el("modalClose");
+    // ---- Contact links
+    const { tel, sms } = buildTel(B.phoneTel || B.phone || "");
+    const email = safeStr(B.email, "");
+    const website = normUrl(B.website);
 
-  function openModal() {
-    if (!modal) return;
-    modal.classList.add("open");
-    document.body.style.overflow = "hidden";
-  }
-  function closeModal() {
-    if (!modal) return;
-    modal.classList.remove("open");
-    document.body.style.overflow = "";
-  }
+    const ctaRow = $("ctaRow");
+    if (ctaRow) ctaRow.style.display = f.basicCtas || f.primaryCta ? "" : "none";
 
-  if (openModalBtn) openModalBtn.addEventListener("click", openModal);
+    // Primary CTA (Pro + Elite)
+    const primaryBtn = $("primaryBtn");
+    const primaryLabel = safeStr(B.primaryCtaLabel, "Request Info");
+    const primaryUrl = normUrl(B.primaryCtaUrl);
 
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
+    if (primaryBtn) {
+      primaryBtn.textContent = primaryLabel;
+      if (!f.primaryCta) {
+        primaryBtn.style.display = "none";
+        disableBtn(primaryBtn);
+      } else {
+        primaryBtn.style.display = "";
+        enableHref(primaryBtn, primaryUrl);
+      }
+    }
+
+    // Basic buttons (Pro + Elite)
+    enableHref($("textBtn"),  f.basicCtas ? sms : "");
+    enableHref($("callBtn"),  f.basicCtas ? tel : "");
+    enableHref($("emailBtn"), f.basicCtas ? (email ? `mailto:${email}` : "") : "");
+    enableHref($("webBtn"),   f.basicCtas ? website : "");
+
+    // No-JS website fallback
+    const webBtnNoJs = $("webBtnNoJs");
+    if (webBtnNoJs) enableHref(webBtnNoJs, website);
+
+    // ---- Elite extras block
+    const eliteBlock = $("eliteBlock");
+    if (eliteBlock) eliteBlock.style.display = f.eliteExtras ? "" : "none";
+
+    // Elite secondary CTA (Elite only) uses #requestInfoBtn in your template
+    const requestInfoBtn = $("requestInfoBtn");
+    const secondaryLabel = safeStr(B.secondaryCtaLabel, "Request More Info");
+    const secondaryUrl = normUrl(B.secondaryCtaUrl);
+
+    if (requestInfoBtn) {
+      requestInfoBtn.textContent = secondaryLabel;
+      if (!f.eliteExtras) {
+        disableBtn(requestInfoBtn);
+      } else {
+        enableHref(requestInfoBtn, secondaryUrl);
+      }
+    }
+
+    // Elite social proof
+    const socialProofWrap = $("socialProof");
+    const socialProof = Array.isArray(B.socialProof) ? B.socialProof : [];
+    if (socialProofWrap) {
+      socialProofWrap.innerHTML = "";
+      if (f.eliteExtras && socialProof.length) {
+        socialProof.forEach((item) => {
+          const text = (typeof item === "string") ? safeStr(item, "") : safeStr(item?.text, "");
+          const name = (typeof item === "object") ? safeStr(item?.name, "") : "";
+          if (!text) return;
+
+          const card = document.createElement("div");
+          card.style.border = "1px solid rgba(255,255,255,.10)";
+          card.style.background = "rgba(0,0,0,.12)";
+          card.style.borderRadius = "14px";
+          card.style.padding = "12px 14px";
+          card.style.fontSize = "14px";
+
+          card.innerHTML = `<div style="opacity:.92;">“${text}”</div>${
+            name ? `<div style="margin-top:6px; opacity:.65; font-size:12px;">— ${name}</div>` : ""
+          }`;
+
+          socialProofWrap.appendChild(card);
+        });
+      }
+    }
+
+    // Elite embedded content
+    const advancedEmbed = $("advancedEmbed");
+    const embedHtml = safeStr(B.embedHtml, "");
+    const embedUrl = safeStr(B.embedUrl, "");
+
+    if (advancedEmbed) {
+      if (f.eliteExtras && (embedHtml || embedUrl)) {
+        advancedEmbed.style.display = "block";
+        advancedEmbed.style.marginTop = "10px";
+
+        if (embedHtml) {
+          advancedEmbed.innerHTML = embedHtml;
+        } else {
+          advancedEmbed.innerHTML = `
+            <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.12); border-radius:14px; overflow:hidden;">
+              <div style="position:relative; width:100%; padding-top:56.25%;">
+                <iframe
+                  src="${embedUrl}"
+                  title="Embedded content"
+                  style="position:absolute; inset:0; width:100%; height:100%; border:0;"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        advancedEmbed.style.display = "none";
+        advancedEmbed.innerHTML = "";
+      }
+    }
+  };
+
+  // ---------- modal ----------
+  const wireModal = () => {
+    const modal = $("modal");
+    const openModalBtn = $("openModal");
+    const modalClose = $("modalClose");
+
+    const open = () => {
+      if (!modal) return;
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    };
+
+    const close = () => {
+      if (!modal) return;
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    };
+
+    openModalBtn?.addEventListener("click", open);
+
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) close();
     });
+
+    modalClose?.addEventListener("click", close);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal?.classList.contains("open")) close();
+    });
+  };
+
+  // ---------- price shine ----------
+  const wirePriceShine = () => {
+    const priceEl = $("priceValue");
+    window.addEventListener("load", () => {
+      if (!priceEl) return;
+      priceEl.classList.add("shine-once");
+      setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
+    });
+  };
+
+  // ---------- ripple ----------
+  const wireRipple = () => {
+    function addRipple(e) {
+      const btn = e.currentTarget;
+      if (!btn || btn.getAttribute("aria-disabled") === "true") return;
+
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2;
+
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+
+      const x = clientX - rect.left - size / 2;
+      const y = clientY - rect.top - size / 2;
+
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      ripple.style.width = ripple.style.height = size + "px";
+      ripple.style.left = x + "px";
+      ripple.style.top = y + "px";
+      btn.appendChild(ripple);
+      ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+    }
+
+    document.querySelectorAll(".btn").forEach((btn) => {
+      btn.addEventListener("click", addRipple);
+      btn.addEventListener("touchstart", addRipple, { passive: true });
+    });
+  };
+
+  // ---------- init ----------
+  const init = () => {
+    apply();
+    wireModal();
+    wirePriceShine();
+    wireRipple();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
   }
-  if (modalClose) modalClose.addEventListener("click", closeModal);
 
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal && modal.classList.contains("open")) closeModal();
-  });
-
-  // ---- Price shine once
-  const priceEl = el("priceValue");
-  window.addEventListener("load", () => {
-    if (!priceEl) return;
-    priceEl.classList.add("shine-once");
-    setTimeout(() => priceEl.classList.remove("shine-once"), 1200);
-  });
-
-  // ---- Ripple effect (buttons)
-  function addRipple(e) {
-    const btn = e.currentTarget;
-    if (!btn || btn.getAttribute("aria-disabled") === "true") return;
-
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height) * 2;
-
-    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
-    const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
-
-    const x = clientX - rect.left - size / 2;
-    const y = clientY - rect.top - size / 2;
-
-    const ripple = document.createElement("span");
-    ripple.className = "ripple";
-    ripple.style.width = ripple.style.height = size + "px";
-    ripple.style.left = x + "px";
-    ripple.style.top = y + "px";
-    btn.appendChild(ripple);
-    ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
-  }
-
-  document.querySelectorAll(".btn").forEach((btn) => {
-    btn.addEventListener("click", addRipple);
-    btn.addEventListener("touchstart", addRipple, { passive: true });
-  });
+  window.addEventListener("hashchange", apply);
 })();
