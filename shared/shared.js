@@ -192,6 +192,8 @@ const applyThemeVars = (tObj) => {
 // - an object override (legacy support)
 let themeToken = (typeof B.theme === "string") ? B.theme.trim() : "";
 themeToken = themeToken.toLowerCase();
+if (!themeToken) themeToken = "aqua";
+    
 
 // Enforce tier rule: starter always aqua
 if (tier === "starter") themeToken = "aqua";
