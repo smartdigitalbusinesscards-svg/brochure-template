@@ -70,7 +70,7 @@
     const hashQuery = rawHash.startsWith("?") ? rawHash.slice(1) : rawHash;
     const hashTier = normalizeTier(new URLSearchParams(hashQuery).get("tier"));
 
-    const tier = qsTier || hashTier || normalizeTier(window.BIZ?.tier) || "starter";
+    const tier = qsTier || hashTier || normalizeTier(window.BIZ?.tier) || "pro";
     return tier;
   };
 
