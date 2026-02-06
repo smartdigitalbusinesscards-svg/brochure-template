@@ -70,6 +70,7 @@
     const hashQuery = rawHash.startsWith("?") ? rawHash.slice(1) : rawHash;
     const hashTier = normalizeTier(new URLSearchParams(hashQuery).get("tier"));
 
+    // Brochure default tier = pro (not starter)
     const tier = qsTier || hashTier || normalizeTier(window.BIZ?.tier) || "pro";
     return tier;
   };
@@ -81,15 +82,84 @@
     elite:   { basicCtas: true,  primaryCta: true,  eliteExtras: true  },
   };
 
+  // ---------- theme tokens ----------
+  const THEMES = {
+    aqua: {
+      bgA: "#04151f",
+      bgB: "#0a2f3f",
+      accent: "#4fe3ff",
+      accent2: "#63ffb2",
+    },
+    mint: {
+      bgA: "#061a16",
+      bgB: "#0b2a24",
+      accent: "#63ffb2",
+      accent2: "#4fe3ff",
+    },
+    midnight: {
+      bgA: "#050916",
+      bgB: "#0a1535",
+      accent: "#4aa8ff",
+      accent2: "#7c5cff",
+    },
+    graphite: {
+      bgA: "#070A12",
+      bgB: "#0B1222",
+      accent: "#4aa8ff",
+      accent2: "#34f7ff",
+    },
+    ember: {
+      bgA: "#120606",
+      bgB: "#2a0b0b",
+      accent: "#ff5a3d",
+      accent2: "#ffb84a",
+    },
+    royal: {
+      bgA: "#07051a",
+      bgB: "#130a33",
+      accent: "#7c5cff",
+      accent2: "#4aa8ff",
+    },
+    elegantPink: {
+      bgA: "#16070f",
+      bgB: "#2a0c1c",
+      accent: "#ff5fa2",
+      accent2: "#ffd1e6",
+    },
+  };
+
+  const applyThemeVars = (tObj) => {
+    if (!tObj) return;
+    const root = document.documentElement.style;
+    if (tObj.accent)  root.setProperty("--accent",  tObj.accent);
+    if (tObj.accent2) root.setProperty("--accent2", tObj.accent2);
+    if (tObj.bgA)     root.setProperty("--bgA",     tObj.bgA);
+    if (tObj.bgB)     root.setProperty("--bgB",     tObj.bgB);
+  };
+
   // ---------- apply ----------
   const apply = () => {
     const B = (window.BIZ && typeof window.BIZ === "object") ? window.BIZ : {};
     const tier = getTier();
     const f = FEATURES[tier];
 
+    // ---- Theme token (default aqua; starter forced aqua)
+    let themeToken = (typeof B.theme === "string") ? B.theme.trim().toLowerCase() : "";
+    if (!themeToken) themeToken = "aqua";
+    if (tier === "starter") themeToken = "aqua";
+
+    if (THEMES[themeToken]) {
+      applyThemeVars(THEMES[themeToken]);
+    } else if (B.theme && typeof B.theme === "object") {
+      // legacy object override supported
+      applyThemeVars(B.theme);
+    } else {
+      applyThemeVars(THEMES.aqua);
+    }
+
     // ---- Brand / headers
     const company = safeStr(B.company, "Company");
-    const offerTitle = safeStr(B.offerTitle || B.title, "Offer Title"); // allow either key
+    const offerTitle = safeStr(B.offerTitle || B.title, "Offer Title");
     const watermark = safeStr(B.watermark, `Installed by ${company}`);
 
     const kicker = $("kicker");
@@ -117,7 +187,7 @@
     const yearEl = $("year");
     if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-    // ---- Product image (FIXED IDs: productImg / productImgNoJs / modalImg)
+    // ---- Product image
     const productImage = safeStr(B.productImage || B.brochureImage || "product.png");
 
     const img = $("productImg");
@@ -129,83 +199,6 @@
     if (imgNoJs) { imgNoJs.src = productImage; imgNoJs.alt = `${company} product image`; }
     if (modalImg) { modalImg.src = productImage; modalImg.alt = `${company} product image enlarged`; }
     if (hintText) hintText.textContent = "Tap the product image to zoom in.";
-
-    // ---- Theme (token-based like eCards)
-// Starter is ALWAYS forced to aqua.
-// Pro/Elite can use: aqua, mint, midnight, graphite, ember, royal, elegantPink
-const THEMES = {
-  aqua: {
-    bgA: "#04151f",
-    bgB: "#0a2f3f",
-    accent: "#4fe3ff",
-    accent2: "#63ffb2",
-  },
-  mint: {
-    bgA: "#061a16",
-    bgB: "#0b2a24",
-    accent: "#63ffb2",
-    accent2: "#4fe3ff",
-  },
-  midnight: {
-    bgA: "#050916",
-    bgB: "#0a1535",
-    accent: "#4aa8ff",
-    accent2: "#7c5cff",
-  },
-  graphite: {
-    bgA: "#070A12",
-    bgB: "#0B1222",
-    accent: "#4aa8ff",
-    accent2: "#34f7ff",
-  },
-  ember: {
-    bgA: "#120606",
-    bgB: "#2a0b0b",
-    accent: "#ff5a3d",
-    accent2: "#ffb84a",
-  },
-  royal: {
-    bgA: "#07051a",
-    bgB: "#130a33",
-    accent: "#7c5cff",
-    accent2: "#4aa8ff",
-  },
-  elegantPink: {
-    bgA: "#16070f",
-    bgB: "#2a0c1c",
-    accent: "#ff5fa2",
-    accent2: "#ffd1e6",
-  },
-};
-
-const applyThemeVars = (tObj) => {
-  if (!tObj) return;
-  const root = document.documentElement.style;
-  if (tObj.accent)  root.setProperty("--accent",  tObj.accent);
-  if (tObj.accent2) root.setProperty("--accent2", tObj.accent2);
-  if (tObj.bgA)     root.setProperty("--bgA",     tObj.bgA);
-  if (tObj.bgB)     root.setProperty("--bgB",     tObj.bgB);
-};
-
-// B.theme can be either:
-// - a token string (recommended): "aqua", "mint", etc.
-// - an object override (legacy support)
-let themeToken = (typeof B.theme === "string") ? B.theme.trim() : "";
-themeToken = themeToken.toLowerCase();
-if (!themeToken) themeToken = "aqua";
-    
-
-// Enforce tier rule: starter always aqua
-if (tier === "starter") themeToken = "aqua";
-
-// If token is valid, apply it
-if (themeToken && THEMES[themeToken]) {
-  applyThemeVars(THEMES[themeToken]);
-}
-// Otherwise, allow legacy object override
-else if (B.theme && typeof B.theme === "object") {
-  applyThemeVars(B.theme);
-}
 
     // ---- Badges
     const badges = Array.isArray(B.badges) ? B.badges : [];
@@ -243,7 +236,7 @@ else if (B.theme && typeof B.theme === "object") {
     const website = normUrl(B.website);
 
     const ctaRow = $("ctaRow");
-    if (ctaRow) ctaRow.style.display = f.basicCtas || f.primaryCta ? "" : "none";
+    if (ctaRow) ctaRow.style.display = (f.basicCtas || f.primaryCta) ? "" : "none";
 
     // Primary CTA (Pro + Elite)
     const primaryBtn = $("primaryBtn");
@@ -275,7 +268,7 @@ else if (B.theme && typeof B.theme === "object") {
     const eliteBlock = $("eliteBlock");
     if (eliteBlock) eliteBlock.style.display = f.eliteExtras ? "" : "none";
 
-    // Elite secondary CTA (Elite only) uses #requestInfoBtn in your template
+    // Elite secondary CTA
     const requestInfoBtn = $("requestInfoBtn");
     const secondaryLabel = safeStr(B.secondaryCtaLabel, "Request More Info");
     const secondaryUrl = normUrl(B.secondaryCtaUrl);
@@ -301,14 +294,9 @@ else if (B.theme && typeof B.theme === "object") {
           if (!text) return;
 
           const card = document.createElement("div");
-          card.style.border = "1px solid rgba(255,255,255,.10)";
-          card.style.background = "rgba(0,0,0,.12)";
-          card.style.borderRadius = "14px";
-          card.style.padding = "12px 14px";
-          card.style.fontSize = "14px";
-
-          card.innerHTML = `<div style="opacity:.92;">“${text}”</div>${
-            name ? `<div style="margin-top:6px; opacity:.65; font-size:12px;">— ${name}</div>` : ""
+          card.className = "proofCard";
+          card.innerHTML = `<div class="proofText">“${text}”</div>${
+            name ? `<div class="proofName">— ${name}</div>` : ""
           }`;
 
           socialProofWrap.appendChild(card);
@@ -330,12 +318,11 @@ else if (B.theme && typeof B.theme === "object") {
           advancedEmbed.innerHTML = embedHtml;
         } else {
           advancedEmbed.innerHTML = `
-            <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.12); border-radius:14px; overflow:hidden;">
-              <div style="position:relative; width:100%; padding-top:56.25%;">
+            <div class="embedShell">
+              <div class="embedRatio">
                 <iframe
                   src="${embedUrl}"
                   title="Embedded content"
-                  style="position:absolute; inset:0; width:100%; height:100%; border:0;"
                   loading="lazy"
                   referrerpolicy="no-referrer"
                   allowfullscreen
